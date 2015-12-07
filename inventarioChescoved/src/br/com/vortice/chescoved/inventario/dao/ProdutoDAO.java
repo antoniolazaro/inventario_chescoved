@@ -17,7 +17,7 @@ public class ProdutoDAO extends DAOAb {
         PreparedStatement stmt = null;
         ResultSet rs = null;
       
-        String sql = SELECT_BASE+" where codigo = ? order by PRODUTO.nome";
+        String sql = SELECT_BASE+" where codigo = ? order by PRODUTO.codigo";
         try {
         	stmt = connection.prepareStatement(sql);
         	stmt.setLong(1, produto.getCodigo());

@@ -1,5 +1,7 @@
 package br.com.vortice.chescoved.inventario.business;
 
+import java.util.List;
+
 import br.com.vortice.chescoved.inventario.dao.MovimentacaoEstoqueDAO;
 import br.com.vortice.chescoved.inventario.model.MovimentacaoEstoqueModel;
 
@@ -18,6 +20,10 @@ public class MovimentacaoEstoqueBusiness{
 		movimentacaoEstoqueDAO.insert(movimentacaoEstoqueModel);
 		movimentacaoEstoqueModel.getProduto().setQuantidade(movimentacaoEstoqueModel.getQuantidade());
 		produtoBusiness.atualizarQuantidade(movimentacaoEstoqueModel.getProduto());
+	}
+	
+	public List<MovimentacaoEstoqueModel> pesquisarMovimentacoes(MovimentacaoEstoqueModel filtro) throws Exception{
+		return movimentacaoEstoqueDAO.pesquisarMovimentacoes(filtro);
 	}
 
 	

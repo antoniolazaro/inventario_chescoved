@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import br.com.vortice.chescoved.inventario.business.InventarioBusiness;
 import br.com.vortice.chescoved.inventario.model.InventarioModel;
 import br.com.vortice.chescoved.inventario.model.InventarioProdutoModel;
+import br.com.vortice.chescoved.inventario.view.HboxFactory;
+import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
@@ -18,9 +20,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -30,10 +29,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 public class InventarioMenuItem {
@@ -42,9 +41,10 @@ public class InventarioMenuItem {
 	private ObservableList<InventarioProdutoModel> conteudoTabela;
 	private InventarioModel inventario;
 	private TableView<InventarioProdutoModel> table;
-	private HBox confirmacaoInventario;
 	private List<InventarioProdutoModel> listaProdutos;
-	
+	private final Label dataInventarioLabel = LabelFactory.getLabelPadrao("Data do Inventário");
+	private final Button addButton = new Button("Confirmar Inventário");
+	 
 	public InventarioMenuItem() {
 		inventarioBusiness = new InventarioBusiness();
 		inventario = new InventarioModel();
@@ -56,7 +56,7 @@ public class InventarioMenuItem {
         table.setEditable(true);
         
         TableColumn<InventarioProdutoModel, Date> codigoCol = new TableColumn<InventarioProdutoModel, Date>("Data Inventário");
-        codigoCol.setMaxWidth(100);
+        codigoCol.setPrefWidth(120);
         codigoCol.setCellValueFactory(new Callback<CellDataFeatures<InventarioProdutoModel, Date>, ObservableValue<Date>>() {
             public ObservableValue<Date> call(CellDataFeatures<InventarioProdutoModel, Date> p) {
                 return new ReadOnlyObjectWrapper(new SimpleDateFormat("dd/MM/yyyy").format(p.getValue().getInventario().getDataInventario()));
@@ -65,7 +65,7 @@ public class InventarioMenuItem {
         
         
         TableColumn<InventarioProdutoModel, String> nomeCol = new TableColumn<InventarioProdutoModel, String>("Produto");
-        nomeCol.setMaxWidth(300);
+        nomeCol.setPrefWidth(300);
         nomeCol.setCellValueFactory(new Callback<CellDataFeatures<InventarioProdutoModel, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<InventarioProdutoModel, String> p) {
                 return new ReadOnlyObjectWrapper(p.getValue().getProduto().getNome());
@@ -73,7 +73,7 @@ public class InventarioMenuItem {
          });
         
         TableColumn<InventarioProdutoModel, Long> codigoProdutoCol = new TableColumn<InventarioProdutoModel, Long>("Código");
-        codigoProdutoCol.setMaxWidth(300);
+        codigoProdutoCol.setPrefWidth(120);
         codigoProdutoCol.setCellValueFactory(new Callback<CellDataFeatures<InventarioProdutoModel, Long>, ObservableValue<Long>>() {
             public ObservableValue<Long> call(CellDataFeatures<InventarioProdutoModel, Long> p) {
                 return new ReadOnlyObjectWrapper(p.getValue().getProduto().getCodigo());
@@ -81,7 +81,7 @@ public class InventarioMenuItem {
          });
 
         TableColumn<InventarioProdutoModel, String> quantidadeContada = new TableColumn<InventarioProdutoModel, String>("Quantidade Contada");
-        quantidadeContada.setMaxWidth(300);
+        quantidadeContada.setPrefWidth(200);
         quantidadeContada.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, String>("quantidade"));
         quantidadeContada.setEditable(true);
         quantidadeContada.setCellFactory(TextFieldTableCell.<InventarioProdutoModel>forTableColumn());
@@ -95,19 +95,15 @@ public class InventarioMenuItem {
 
 
         TableColumn<InventarioProdutoModel, Integer> quantidadeEstoque = new TableColumn<InventarioProdutoModel, Integer>("Quantidade Estoque");
-        quantidadeEstoque.setMaxWidth(150);
+        quantidadeEstoque.setPrefWidth(200);
         quantidadeEstoque.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, Integer>("quantidadeEstoque"));
         
         TableColumn<InventarioProdutoModel, Integer> quantidadeDivergencia = new TableColumn<InventarioProdutoModel, Integer>("Divergência");
-        quantidadeDivergencia.setMaxWidth(150);
+        quantidadeDivergencia.setPrefWidth(200);
         quantidadeDivergencia.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, Integer>("quantidadeDivergencia"));
         
-        TableColumn<InventarioProdutoModel, Integer> quantidadeFinal = new TableColumn<InventarioProdutoModel, Integer>("Quantidade Final");
-        quantidadeFinal.setMaxWidth(150);
-        quantidadeFinal.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, Integer>("quantidadeFinal"));
-        
         TableColumn<InventarioProdutoModel, BigDecimal> valorCusto = new TableColumn<InventarioProdutoModel, BigDecimal>("Valor Custo");
-        valorCusto.setMaxWidth(150);
+        valorCusto.setPrefWidth(200);
         valorCusto.setCellValueFactory(new Callback<CellDataFeatures<InventarioProdutoModel, BigDecimal>, ObservableValue<BigDecimal>>() {
             public ObservableValue<BigDecimal> call(CellDataFeatures<InventarioProdutoModel, BigDecimal> p) {
                 return new ReadOnlyObjectWrapper(p.getValue().getProduto().getValorCusto());
@@ -115,11 +111,11 @@ public class InventarioMenuItem {
          });
 
         TableColumn<InventarioProdutoModel, BigDecimal> totalCusto = new TableColumn<InventarioProdutoModel, BigDecimal>("Total Custo");
-        totalCusto.setMaxWidth(150);
+        totalCusto.setPrefWidth(200);
         totalCusto.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, BigDecimal>("totalCusto"));
         
         TableColumn<InventarioProdutoModel, BigDecimal> valorVenda = new TableColumn<InventarioProdutoModel, BigDecimal>("Valor Venda");
-        valorVenda.setMaxWidth(150);
+        valorVenda.setPrefWidth(200);
         valorVenda.setCellValueFactory(new Callback<CellDataFeatures<InventarioProdutoModel, BigDecimal>, ObservableValue<BigDecimal>>() {
             public ObservableValue<BigDecimal> call(CellDataFeatures<InventarioProdutoModel, BigDecimal> p) {
                 return new ReadOnlyObjectWrapper(p.getValue().getProduto().getValorVenda());
@@ -127,23 +123,25 @@ public class InventarioMenuItem {
          });
 
         TableColumn<InventarioProdutoModel, BigDecimal> totalVenda = new TableColumn<InventarioProdutoModel, BigDecimal>("Total Venda");
-        totalVenda.setMaxWidth(150);
+        totalVenda.setPrefWidth(200);
         totalVenda.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, BigDecimal>("totalVenda"));
         
         conteudoTabela = FXCollections.observableArrayList(new ArrayList<InventarioProdutoModel>());
        
         table.setItems(conteudoTabela);
-        table.getColumns().addAll(codigoCol,nomeCol,codigoProdutoCol,quantidadeContada,quantidadeEstoque,quantidadeDivergencia,quantidadeFinal,valorCusto,totalCusto,valorVenda,totalVenda);
+        table.getColumns().addAll(codigoCol,nomeCol,codigoProdutoCol,quantidadeContada,quantidadeEstoque,quantidadeDivergencia,valorCusto,totalCusto,valorVenda,totalVenda);
         return table;
 	}
 
 	
-	private HBox createFiltroProduto(){
-		final HBox hb = new HBox();
+	private VBox createFiltroProduto(){
+		final VBox vb = new VBox();
         
 		final TextField dataInventario = new TextField();
 		dataInventario.setPromptText("Data do Inventário");
 		dataInventario.setMaxWidth(100);
+		HBox hb = HboxFactory.getHBoxPadrao(dataInventarioLabel, dataInventario);
+		vb.getChildren().add(hb);
        
         final Button addButton = new Button("Criar Inventário");
         
@@ -166,22 +164,25 @@ public class InventarioMenuItem {
         	        conteudoTabela = FXCollections.observableArrayList(listaProdutos);
         	        table.setItems(conteudoTabela);
             		table.setVisible(true);
-            		confirmacaoInventario.setVisible(true);
+            		addButton.setVisible(true);
             	}catch(Exception ex){
             		ShowAlertUtil.exibirMensagemErro("Erro: "+ex.getMessage());
                 }
             }
         });
         
-        hb.getChildren().addAll(dataInventario,addButton);
-        hb.setSpacing(5);
-        return hb;
+        vb.getChildren().add(addButton);
+        
+        return vb;
 	}
 	
-	private HBox confirmeInventario(){
-		final HBox hb = new HBox();
-        
-        final Button addButton = new Button("Confirmar Inventário");
+	public void buildMenuItem(BorderPane root){
+	    final Label label = new Label("Inventário");
+        label.setFont(new Font("Arial", 20));
+
+        VBox pesquisar = createFiltroProduto();
+        table = createTableView();
+        table.setVisible(false);
         
         addButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -195,33 +196,12 @@ public class InventarioMenuItem {
                 }
             }
         });
-        
-        hb.getChildren().addAll(addButton);
-        hb.setSpacing(5);
-        return hb;
-	}
-	
-	public void buildMenuItem(Stage primaryStage){
-		Scene scene = new Scene(new Group());
-	    final Label label = new Label("Inventário");
-        label.setFont(new Font("Arial", 20));
-
-        HBox pesquisar = createFiltroProduto();
-        table = createTableView();
-        table.setVisible(false);
-        
-        confirmacaoInventario = confirmeInventario();
-        confirmacaoInventario.setVisible(false);
+        addButton.setVisible(false);
         
         final VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label,pesquisar,table,confirmacaoInventario);
+        vbox.getChildren().addAll(label,pesquisar,table,addButton);
  
-        ((Group) scene.getRoot()).getChildren().addAll(vbox);
-        
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        root.setCenter(vbox);
 
 	}
 }

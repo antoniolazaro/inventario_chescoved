@@ -9,28 +9,36 @@ import br.com.vortice.chescoved.inventario.business.ProdutoBusiness;
 import br.com.vortice.chescoved.inventario.model.MovimentacaoEstoqueModel;
 import br.com.vortice.chescoved.inventario.model.ProdutoModel;
 import br.com.vortice.chescoved.inventario.model.TipoMovimentacaoEstoqueModel;
+import br.com.vortice.chescoved.inventario.view.AutoCompleteComboBoxListener;
+import br.com.vortice.chescoved.inventario.view.HboxFactory;
+import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
 public class MovimentacaoEstoqueMenuItem {
 	
 	private MovimentacaoEstoqueBusiness movimentacaoEstoqueBusiness;
-	private ProdutoBusiness produtoBusiness;
+	private final ProdutoBusiness produtoBusiness;
+	private final Label tipoMovimentacaoLabel = LabelFactory.getLabelPadrao("Tipo de movimentação");
+	private final Label dataMovimentacaoLabel = LabelFactory.getLabelPadrao("Data de movimentação");
+	private final Label produtoLabel = LabelFactory.getLabelPadrao("Produto");
+	private final Label quantidadeLabel = LabelFactory.getLabelPadrao("Quantidade");
+	private final Label notaFiscalLabel = LabelFactory.getLabelPadrao("Nota Fiscal");
+	private final Label dataRecebimentoLabel = LabelFactory.getLabelPadrao("Data de recebimento");
+	private final VBox vb = new VBox();
 	
 	public MovimentacaoEstoqueMenuItem() {
 		movimentacaoEstoqueBusiness = new MovimentacaoEstoqueBusiness();
@@ -39,35 +47,52 @@ public class MovimentacaoEstoqueMenuItem {
 	
 	private VBox createRemoverPalleteSection() throws Exception{
 		
-        
+		ToggleGroup group = new ToggleGroup();
+		
 		RadioButton entradaRadioButton = new RadioButton();
 		entradaRadioButton.setText("Entrada");
 		entradaRadioButton.setSelected(true);
+		entradaRadioButton.setToggleGroup(group);
+
 		RadioButton saidaRadioButton = new RadioButton();
 		saidaRadioButton.setText("Saida");
+		saidaRadioButton.setToggleGroup(group);
 		
-		HBox hb = new HBox();
-		hb.getChildren().addAll(entradaRadioButton,saidaRadioButton);
+		HBox hb = HboxFactory.getHBoxPadrao(tipoMovimentacaoLabel, entradaRadioButton);
+		hb.getChildren().add(saidaRadioButton);
+		vb.getChildren().add(hb);
 		
-        final TextField dataMovimentacao = new TextField();
+		final TextField dataMovimentacao = new TextField();
         dataMovimentacao.setPromptText("Data de movimentação");
         dataMovimentacao.setMaxWidth(100);
+        hb = HboxFactory.getHBoxPadrao(dataMovimentacaoLabel, dataMovimentacao);
+        vb.getChildren().add(hb);
         
         ObservableList<ProdutoModel> options = FXCollections.observableArrayList(produtoBusiness.selectAll());
-        ComboBox<ProdutoModel> comboBox = new ComboBox<ProdutoModel>();
+        ComboBox<ProdutoModel> comboBox = new ComboBox<ProdutoModel>();      
         comboBox.setItems(options);
+        new AutoCompleteComboBoxListener<ProdutoModel>(comboBox);
+        hb = HboxFactory.getHBoxPadrao(produtoLabel, comboBox);
+        vb.getChildren().add(hb);
         
         final TextField quantidade = new TextField();
         quantidade.setPromptText("Quantidade");
         quantidade.setMaxWidth(100);
+        hb = HboxFactory.getHBoxPadrao(quantidadeLabel, quantidade);
+        vb.getChildren().add(hb);
         
         final TextField notaFiscal = new TextField();
         notaFiscal.setPromptText("Nota Fiscal");
         notaFiscal.setMaxWidth(100);
+        hb = HboxFactory.getHBoxPadrao(notaFiscalLabel, notaFiscal);
+        vb.getChildren().add(hb);
         
         final TextField dataRecebimento = new TextField();
         dataRecebimento.setPromptText("Data Recebimento");
         dataRecebimento.setMaxWidth(100);
+        hb = HboxFactory.getHBoxPadrao(dataRecebimentoLabel, dataRecebimento);
+        vb.getChildren().add(hb);
+        
         
         final Button addButton = new Button("Confirmar");
         
@@ -120,29 +145,23 @@ public class MovimentacaoEstoqueMenuItem {
             }
         });
         
-        final VBox vb = new VBox();
-        vb.getChildren().addAll(hb,dataMovimentacao,comboBox,quantidade,notaFiscal,dataRecebimento,addButton);
+        
+        vb.getChildren().add(addButton);
         vb.setSpacing(8);
         return vb;
 	}
 	
 
-	public void buildMenuItem(Stage primaryStage) {
-		Scene scene = new Scene(new Group());
+	public void buildMenuItem(BorderPane root) {
 	    final Label label = new Label("Estoque Principal -> Movimentação de Estoque");
         label.setFont(new Font("Arial", 20));
 
         try{
         	VBox removerPalleteSection = createRemoverPalleteSection();
     		final VBox vbox = new VBox();
-            vbox.setSpacing(8);
-            vbox.setPadding(new Insets(10, 0, 0, 10));
             vbox.getChildren().addAll(label,removerPalleteSection);
-     
-            ((Group) scene.getRoot()).getChildren().addAll(vbox);
             
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            root.setCenter(vbox);
     	}catch(Exception ex){
     		ShowAlertUtil.exibirMensagemErro("Erro: "+ex.getMessage());
         }

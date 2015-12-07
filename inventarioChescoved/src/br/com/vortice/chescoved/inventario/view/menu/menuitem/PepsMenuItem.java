@@ -9,6 +9,9 @@ import br.com.vortice.chescoved.inventario.business.PepsBusiness;
 import br.com.vortice.chescoved.inventario.business.ProdutoBusiness;
 import br.com.vortice.chescoved.inventario.model.PepsModel;
 import br.com.vortice.chescoved.inventario.model.ProdutoModel;
+import br.com.vortice.chescoved.inventario.view.AutoCompleteComboBoxListener;
+import br.com.vortice.chescoved.inventario.view.HboxFactory;
+import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
@@ -16,9 +19,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -26,10 +26,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 public class PepsMenuItem {
@@ -38,6 +38,7 @@ public class PepsMenuItem {
 	private TableView<PepsModel> table;
 	private PepsBusiness pepsBusiness;
 	private ProdutoBusiness produtoBusiness;
+	private final Label produtoLabel = LabelFactory.getLabelPadrao("Produto");
 	
 	
 	public PepsMenuItem() {
@@ -52,7 +53,7 @@ public class PepsMenuItem {
         
         
         TableColumn<PepsModel, String> nomeCol = new TableColumn<PepsModel, String>("Produto");
-        nomeCol.setMaxWidth(300);
+        nomeCol.setPrefWidth(300);
         nomeCol.setCellValueFactory(new Callback<CellDataFeatures<PepsModel, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<PepsModel, String> p) {
                 return new ReadOnlyObjectWrapper(p.getValue().getProduto().getNome());
@@ -60,7 +61,7 @@ public class PepsMenuItem {
          });
         
         TableColumn<PepsModel, Long> codigoProdutoCol = new TableColumn<PepsModel, Long>("Código");
-        codigoProdutoCol.setMaxWidth(300);
+        codigoProdutoCol.setPrefWidth(150);
         codigoProdutoCol.setCellValueFactory(new Callback<CellDataFeatures<PepsModel, Long>, ObservableValue<Long>>() {
             public ObservableValue<Long> call(CellDataFeatures<PepsModel, Long> p) {
                 return new ReadOnlyObjectWrapper(p.getValue().getProduto().getCodigo());
@@ -68,7 +69,7 @@ public class PepsMenuItem {
          });
 
         TableColumn<PepsModel, Date> quantidadeEstoque = new TableColumn<PepsModel, Date>("Data Movimentação");
-        quantidadeEstoque.setMaxWidth(150);
+        quantidadeEstoque.setPrefWidth(150);
         quantidadeEstoque.setCellValueFactory(new Callback<CellDataFeatures<PepsModel, Date>, ObservableValue<Date>>() {
             public ObservableValue<Date> call(CellDataFeatures<PepsModel, Date> p) {
             	if(p.getValue().getDataMovimentacao() != null){
@@ -79,7 +80,7 @@ public class PepsMenuItem {
          });
         
         TableColumn<PepsModel, Date> quantidadeDivergencia = new TableColumn<PepsModel, Date>("Data Recebimento");
-        quantidadeDivergencia.setMaxWidth(150);
+        quantidadeDivergencia.setPrefWidth(150);
         quantidadeDivergencia.setCellValueFactory(new Callback<CellDataFeatures<PepsModel, Date>, ObservableValue<Date>>() {
             public ObservableValue<Date> call(CellDataFeatures<PepsModel, Date> p) {
             	if(p.getValue().getDataRecebimento() != null){
@@ -90,32 +91,36 @@ public class PepsMenuItem {
          });
         
         TableColumn<PepsModel, String> quantidadeFinal = new TableColumn<PepsModel, String>("Nota Fiscal");
-        quantidadeFinal.setMaxWidth(150);
+        quantidadeFinal.setPrefWidth(150);
         quantidadeFinal.setCellValueFactory(new PropertyValueFactory<PepsModel, String>("notaFiscal"));
         
         TableColumn<PepsModel, String> quantidadeNota = new TableColumn<PepsModel, String>("Quantidade Nota");
-        quantidadeNota.setMaxWidth(150);
+        quantidadeNota.setPrefWidth(150);
         quantidadeNota.setCellValueFactory(new PropertyValueFactory<PepsModel, String>("quantidade"));
         
         TableColumn<PepsModel, String> quantidadeRestante = new TableColumn<PepsModel, String>("Quantidade Restante");
-        quantidadeRestante.setMaxWidth(150);
+        quantidadeRestante.setPrefWidth(150);
         quantidadeRestante.setCellValueFactory(new PropertyValueFactory<PepsModel, String>("quantidadeRestante"));
         
         conteudoTabela = FXCollections.observableArrayList(new ArrayList<PepsModel>());
-       
         table.setItems(conteudoTabela);
         table.getColumns().addAll(nomeCol,codigoProdutoCol,quantidadeEstoque,quantidadeDivergencia,quantidadeFinal,quantidadeNota,quantidadeRestante);
         return table;
 	}
 
 	
-	private HBox createFiltroProduto() throws Exception{
-		final HBox hb = new HBox();
+	private VBox createFiltroProduto() throws Exception{
+		final VBox vb = new VBox();
         
 		ObservableList<ProdutoModel> options = FXCollections.observableArrayList(produtoBusiness.selectAll());
 	    ComboBox<ProdutoModel> comboBox = new ComboBox<ProdutoModel>();
 	    comboBox.setItems(options);
-       
+	 
+	    new AutoCompleteComboBoxListener<ProdutoModel>(comboBox);
+
+	    HBox hb = HboxFactory.getHBoxPadrao(produtoLabel, comboBox);
+		vb.getChildren().add(hb);
+	   
         final Button addButton = new Button("PEPS");
         
         addButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -132,27 +137,26 @@ public class PepsMenuItem {
         	        if(listaProdutos == null){
         	        	listaProdutos = new ArrayList<PepsModel>();
         	        }
+        	        conteudoTabela.clear();
         	        conteudoTabela = FXCollections.observableArrayList(listaProdutos);
         	        table.setItems(conteudoTabela);
-            		table.setVisible(true);
+        	        table.setVisible(true);
             	}catch(Exception ex){
             		ShowAlertUtil.exibirMensagemErro("Erro: "+ex.getMessage());
                 }
             }
         });
         
-        hb.getChildren().addAll(comboBox,addButton);
-        hb.setSpacing(5);
-        return hb;
+        vb.getChildren().addAll(addButton);
+        return vb;
 	}
 	
 	
-	public void buildMenuItem(Stage primaryStage){
-		Scene scene = new Scene(new Group());
+	public void buildMenuItem(BorderPane root){
 	    final Label label = new Label("PEPS");
         label.setFont(new Font("Arial", 20));
 
-        HBox pesquisar = null;
+        VBox pesquisar = null;
 		try {
 			pesquisar = createFiltroProduto();
 		} catch (Exception e) {
@@ -162,14 +166,9 @@ public class PepsMenuItem {
         table.setVisible(false);
         
         final VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().addAll(label,pesquisar,table);
  
-        ((Group) scene.getRoot()).getChildren().addAll(vbox);
-        
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        root.setCenter(vbox);
 
 	}
 }

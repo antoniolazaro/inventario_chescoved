@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import br.com.vortice.chescoved.inventario.business.ProdutoBusiness;
 import br.com.vortice.chescoved.inventario.model.ProdutoModel;
+import br.com.vortice.chescoved.inventario.view.HboxFactory;
+import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,9 +17,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -25,10 +24,10 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
 public class ProdutoMenuItem {
 	
@@ -42,13 +41,23 @@ public class ProdutoMenuItem {
     private final TextField localEstoque = new TextField();
     private final TextField valorCusto = new TextField();
     private final TextField valorVenda = new TextField();
-	
+    private final TableView<ProdutoModel> table = new TableView<ProdutoModel>();
+    
+    private final Label codigoBuscaLabel = LabelFactory.getLabelPadrao("Código");
+    private final Label nomeBuscaLabel = LabelFactory.getLabelPadrao("Produto");
+    private final Label localEstoqueBuscaLabel = LabelFactory.getLabelPadrao("Local do Estoque");
+    private final Label codigoLabel = LabelFactory.getLabelPadrao("Código");
+    private final Label nomeLabel = LabelFactory.getLabelPadrao("Produto");
+    private final Label localEstoqueLabel = LabelFactory.getLabelPadrao("Local do Estoque");
+    private final Label valorCustoLabel = LabelFactory.getLabelPadrao("Valor de Custo");
+    private final Label valorVendaLabel = LabelFactory.getLabelPadrao("Valor de Venda");
+    
+    
 	public ProdutoMenuItem() {
 		produtoBusiness = new ProdutoBusiness();
 	}
 	
 	private TableView<ProdutoModel> createTableView(){
-		TableView<ProdutoModel> table = new TableView<ProdutoModel>();
 		table.setRowFactory( tv -> {
 		    TableRow<ProdutoModel> row = new TableRow<>();
 		    row.setOnMouseClicked(event -> {
@@ -98,7 +107,13 @@ public class ProdutoMenuItem {
         totalVenda.setMaxWidth(150);
         totalVenda.setCellValueFactory(new PropertyValueFactory<ProdutoModel, BigDecimal>("totalVenda"));
        
-        List<ProdutoModel> listaProdutos = null;
+        reloadTable(table);
+        table.getColumns().addAll(codigoCol,nomeCol,localEstoqueCol,quantidadeCol,valorCustoCol,totalCusto,valorVendaCol,totalVenda);
+        return table;
+	}
+
+	protected void reloadTable(TableView<ProdutoModel> table) {
+		List<ProdutoModel> listaProdutos = null;
         try{
         	listaProdutos = produtoBusiness.selectAll();
 	        
@@ -126,6 +141,7 @@ public class ProdutoMenuItem {
                 return false; // Does not match.
             });
         });
+        
         nomeSearch.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(produto -> {
                 // If filter text is empty, display all persons.
@@ -133,7 +149,7 @@ public class ProdutoMenuItem {
                     return true;
                 }
 
-                if (produto.getNome().contains(newValue)) {
+                if (produto.getNome().contains(newValue.toUpperCase())) {
                     return true; // Filter matches first name.
                 }
                 return false; // Does not match.
@@ -146,7 +162,7 @@ public class ProdutoMenuItem {
                     return true;
                 }
 
-                if (produto.getLocalEstoque().contains(newValue)) {
+                if (produto.getLocalEstoque().contains(newValue.toUpperCase())) {
                     return true; // Filter matches first name.
                 }
                 return false; // Does not match.
@@ -160,30 +176,37 @@ public class ProdutoMenuItem {
 
         
         table.setItems(sortedData);
-        table.getColumns().addAll(codigoCol,nomeCol,localEstoqueCol,quantidadeCol,valorCustoCol,totalCusto,valorVendaCol,totalVenda);
-        return table;
 	}
 
-	private HBox createAdicionarProduto(){
-		final HBox hb = new HBox();
+	private VBox createAdicionarProduto(){
+		final VBox vb = new VBox();
         
         codigo.setPromptText("Código");
         codigo.setMaxWidth(100);
+        HBox hb = HboxFactory.getHBoxPadrao(codigoLabel, codigo);
+		vb.getChildren().add(hb);
         
         nome.setPromptText("Nome");
         nome.setMaxWidth(200);
+        hb = HboxFactory.getHBoxPadrao(nomeLabel, nome);
+		vb.getChildren().add(hb);
         
         localEstoque.setPromptText("Local do Estoque");
         localEstoque.setMaxWidth(200);
+        hb = HboxFactory.getHBoxPadrao(localEstoqueLabel, localEstoque);
+		vb.getChildren().add(hb);
         
         valorCusto.setPromptText("Valor Custo");
         valorCusto.setMaxWidth(200);
+        hb = HboxFactory.getHBoxPadrao(valorCustoLabel, valorCusto);
+		vb.getChildren().add(hb);
         
         valorVenda.setPromptText("Valor Venda");
         valorVenda.setMaxWidth(200);
+        hb = HboxFactory.getHBoxPadrao(valorVendaLabel, valorVenda);
+		vb.getChildren().add(hb);
         
-       
-        final Button addButton = new Button("Adicionar Produto");
+        final Button addButton = new Button("SALVAR");
         
         addButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -209,6 +232,9 @@ public class ProdutoMenuItem {
 	            	ProdutoModel produtoModel = new ProdutoModel(Long.valueOf(codigo.getText()),nome.getText(),localEstoque.getText(),new BigDecimal(valorCusto.getText()),new BigDecimal(valorVenda.getText()));
 	            	if(produtoBusiness.insertOrUpdate(produtoModel)){
 	            		conteudoTabela.add(produtoModel);	
+	            	}else{
+	            		conteudoTabela.clear();
+	            		reloadTable(table);
 	            	}
 	                codigo.clear();
 	                nome.clear();
@@ -221,46 +247,43 @@ public class ProdutoMenuItem {
                 }
             }
         });
-        hb.getChildren().addAll(codigo,nome,localEstoque,valorCusto,valorVenda,addButton);
-        hb.setSpacing(5);
-        return hb;
+        vb.getChildren().add(addButton);
+        return vb;
 	}
 	
-	private HBox createFiltroProduto(){
-		final HBox hb = new HBox();
+	private VBox createFiltroProduto(){
+		final VBox vb = new VBox();
         
         codigoSearch.setPromptText("Código");
         codigoSearch.setMaxWidth(100);
+        HBox hb = HboxFactory.getHBoxPadrao(codigoBuscaLabel, codigoSearch);
+		vb.getChildren().add(hb);
        
         nomeSearch.setPromptText("Nome");
         nomeSearch.setMaxWidth(200);
+        hb = HboxFactory.getHBoxPadrao(nomeBuscaLabel, nomeSearch);
+		vb.getChildren().add(hb);
+       
         
         localEstoqueSearch.setPromptText("Local Estoque");
         localEstoqueSearch.setMaxWidth(200);
+        hb = HboxFactory.getHBoxPadrao(localEstoqueBuscaLabel, localEstoqueSearch);
+		vb.getChildren().add(hb);
         
-        hb.getChildren().addAll(codigoSearch,nomeSearch,localEstoqueSearch);
-        hb.setSpacing(5);
-        return hb;
+        return vb;
 	}
 
-	public void buildMenuItem(Stage primaryStage){
-		Scene scene = new Scene(new Group());
+	public void buildMenuItem(BorderPane root){
 	    final Label label = new Label("Lista Produtos");
         label.setFont(new Font("Arial", 20));
 
-        HBox pesquisar = createFiltroProduto();
+        VBox pesquisar = createFiltroProduto();
         TableView<ProdutoModel> table = createTableView();
-        HBox adicionarPalleteSection = createAdicionarProduto();
+        VBox adicionarPalleteSection = createAdicionarProduto();
         
         final VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().addAll(label,pesquisar,table,adicionarPalleteSection);
- 
-        ((Group) scene.getRoot()).getChildren().addAll(vbox);
-        
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        root.setCenter(vbox);
 
 	}
 }

@@ -14,8 +14,10 @@ public class InventarioMain extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			CreateDatabaseStructure.initDatabase();
+			
 			BorderPane root = new BorderPane();
-		    Scene scene = new Scene(root, 800, 600, Color.WHITE);
+		    Scene scene = new Scene(root, 1024, 2048, Color.BLACK);
+		    
 		    MenuBuilder menuBuilder = new  MenuBuilder(primaryStage, root);
 			menuBuilder.buildMenu();
 			primaryStage.setScene(scene);

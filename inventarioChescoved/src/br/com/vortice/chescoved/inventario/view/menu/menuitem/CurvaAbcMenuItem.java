@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import br.com.vortice.chescoved.inventario.business.CurvaAbcBusiness;
 import br.com.vortice.chescoved.inventario.model.CurvaAbcModel;
+import br.com.vortice.chescoved.inventario.view.HboxFactory;
+import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
@@ -16,9 +18,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -26,10 +25,10 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 public class CurvaAbcMenuItem {
@@ -38,7 +37,9 @@ public class CurvaAbcMenuItem {
 	private TableView<CurvaAbcModel> table;
 	private CurvaAbcBusiness curvaAbcBusiness;
 	private CurvaAbcModel curvaAbcModel;
-	
+	private final Label dataInicioLabel = LabelFactory.getLabelPadrao("Data Início");
+	private final Label dataFimLabel = LabelFactory.getLabelPadrao("Data Fim");
+	private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
 	public CurvaAbcMenuItem() {
 		curvaAbcBusiness = new CurvaAbcBusiness();
@@ -51,11 +52,11 @@ public class CurvaAbcMenuItem {
         table.setEditable(false);
         
         TableColumn<CurvaAbcModel, BigDecimal> totalCusto = new TableColumn<CurvaAbcModel, BigDecimal>("Classificação");
-        totalCusto.setMaxWidth(150);
+        totalCusto.setPrefWidth(150);
         totalCusto.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, BigDecimal>("classificacaoCurvaABC"));
         
         TableColumn<CurvaAbcModel, String> nomeCol = new TableColumn<CurvaAbcModel, String>("Produto");
-        nomeCol.setMaxWidth(300);
+        nomeCol.setPrefWidth(300);
         nomeCol.setCellValueFactory(new Callback<CellDataFeatures<CurvaAbcModel, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<CurvaAbcModel, String> p) {
                 return new ReadOnlyObjectWrapper(p.getValue().getProduto().getNome());
@@ -63,7 +64,7 @@ public class CurvaAbcMenuItem {
          });
         
         TableColumn<CurvaAbcModel, Long> codigoProdutoCol = new TableColumn<CurvaAbcModel, Long>("Código");
-        codigoProdutoCol.setMaxWidth(300);
+        codigoProdutoCol.setPrefWidth(150);
         codigoProdutoCol.setCellValueFactory(new Callback<CellDataFeatures<CurvaAbcModel, Long>, ObservableValue<Long>>() {
             public ObservableValue<Long> call(CellDataFeatures<CurvaAbcModel, Long> p) {
                 return new ReadOnlyObjectWrapper(p.getValue().getProduto().getCodigo());
@@ -71,15 +72,15 @@ public class CurvaAbcMenuItem {
          });
 
         TableColumn<CurvaAbcModel, Integer> quantidadeEstoque = new TableColumn<CurvaAbcModel, Integer>("Quantidade");
-        quantidadeEstoque.setMaxWidth(150);
+        quantidadeEstoque.setPrefWidth(150);
         quantidadeEstoque.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, Integer>("quantidade"));
         
         TableColumn<CurvaAbcModel, BigDecimal> quantidadeDivergencia = new TableColumn<CurvaAbcModel, BigDecimal>("Custo Unitário");
-        quantidadeDivergencia.setMaxWidth(150);
+        quantidadeDivergencia.setPrefWidth(150);
         quantidadeDivergencia.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, BigDecimal>("valorUnitario"));
         
         TableColumn<CurvaAbcModel, Integer> quantidadeFinal = new TableColumn<CurvaAbcModel, Integer>("Valor Total");
-        quantidadeFinal.setMaxWidth(150);
+        quantidadeFinal.setPrefWidth(150);
         quantidadeFinal.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, Integer>("valorTotal"));
         
         conteudoTabela = FXCollections.observableArrayList(new ArrayList<CurvaAbcModel>());
@@ -90,24 +91,27 @@ public class CurvaAbcMenuItem {
 	}
 
 	
-	private HBox createFiltroProduto(){
-		final HBox hb = new HBox();
+	private VBox createFiltroProduto(){
+		final VBox vb = new VBox();
         
 		final TextField dataInicio = new TextField();
 		dataInicio.setPromptText("Data Início");
-		dataInicio.setMaxWidth(100);
+		dataInicio.setPrefWidth(100);
+		HBox hb = HboxFactory.getHBoxPadrao(dataInicioLabel, dataInicio);
+		vb.getChildren().add(hb);
 		
 		final TextField dataFim = new TextField();
 		dataFim.setPromptText("Data Fim");
-		dataFim.setMaxWidth(100);
-       
+		dataFim.setPrefWidth(100);
+		hb = HboxFactory.getHBoxPadrao(dataFimLabel, dataFim);
+		vb.getChildren().add(hb);
+		
         final Button addButton = new Button("Calcular curva ABC");
         
         addButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
             	try{
-            		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
             		
             		if(StringUtils.isNotEmpty(dataInicio.getText())){
             			curvaAbcModel.setDataInicio(simpleDateFormat.parse(dataInicio.getText()));	
@@ -133,30 +137,23 @@ public class CurvaAbcMenuItem {
             }
         });
         
-        hb.getChildren().addAll(dataInicio,dataFim,addButton);
-        hb.setSpacing(5);
-        return hb;
+        vb.getChildren().addAll(addButton);
+        return vb;
 	}
 	
 	
-	public void buildMenuItem(Stage primaryStage){
-		Scene scene = new Scene(new Group());
+	public void buildMenuItem(BorderPane root){
 	    final Label label = new Label("Curva ABC");
         label.setFont(new Font("Arial", 20));
 
-        HBox pesquisar = createFiltroProduto();
+        VBox pesquisar = createFiltroProduto();
         table = createTableView();
         table.setVisible(false);
         
         final VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().addAll(label,pesquisar,table);
  
-        ((Group) scene.getRoot()).getChildren().addAll(vbox);
-        
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        root.setCenter(vbox);
 
 	}
 }
