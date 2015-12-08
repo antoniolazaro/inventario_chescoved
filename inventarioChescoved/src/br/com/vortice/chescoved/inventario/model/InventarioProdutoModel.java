@@ -10,6 +10,9 @@ public class InventarioProdutoModel {
 	private Integer quantidade;
 	private Integer quantidadeEstoque;
 	private Integer quantidadeFinal;
+	private Integer quantidadeDivergencia;
+	private BigDecimal totalCusto;
+	private BigDecimal totalVenda;
 	
 	public Long getCodigo() {
 		return codigo;
@@ -62,19 +65,11 @@ public class InventarioProdutoModel {
 		}
 	}
 	public BigDecimal getTotalCusto(){
-		if(produto.getValorCusto() != null && quantidadeEstoque != null){
-			return produto.getValorCusto().multiply(new BigDecimal(quantidadeEstoque));
-		}else{
-			return new BigDecimal(0);
-		}
+		return totalCusto;
 	}
 	
 	public BigDecimal getTotalVenda(){
-		if(produto.getValorVenda() != null && quantidadeEstoque != null){
-			return produto.getValorVenda().multiply(new BigDecimal(quantidadeEstoque));
-		}else{
-			return new BigDecimal(0);
-		}
+		return totalVenda;
 	}
 	
 	@Override
@@ -100,6 +95,15 @@ public class InventarioProdutoModel {
 		} else if (!codigo.equals(other.codigo))
 			return false;
 		return true;
+	}
+	public void setQuantidadeDivergencia(Integer quantidadeDivergencia) {
+		this.quantidadeDivergencia = quantidadeDivergencia;
+	}
+	public void setTotalCusto(BigDecimal totalCusto) {
+		this.totalCusto = totalCusto;
+	}
+	public void setTotalVenda(BigDecimal totalVenda) {
+		this.totalVenda = totalVenda;
 	}
 
 }

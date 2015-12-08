@@ -247,7 +247,7 @@ public class ProdutoMenuItem {
             			ShowAlertUtil.exibirMensagemErro("Campo valor de venda é obrigatório.");
             		}
             		
-	            	ProdutoModel produtoModel = new ProdutoModel(Long.valueOf(codigo.getText()),nome.getText(),localEstoque.getText(),new BigDecimal(valorCusto.getText().replaceAll("R$ ","")),new BigDecimal(valorVenda.getText().replaceAll("R$ ","")));
+	            	ProdutoModel produtoModel = new ProdutoModel(Long.valueOf(codigo.getText()),nome.getText(),localEstoque.getText(),new BigDecimal(valorCusto.getText().replaceAll("R\\$ ","")),new BigDecimal(valorVenda.getText().replaceAll("R\\$ ","")));
 	            	if(produtoBusiness.insertOrUpdate(produtoModel)){
 	            		conteudoTabela.add(produtoModel);	
 	            	}else{

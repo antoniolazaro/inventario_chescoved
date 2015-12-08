@@ -22,6 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -88,14 +89,21 @@ public class InventarioMenuItem {
         TableColumn<InventarioProdutoModel, Integer> quantidadeContada = new TableColumn<InventarioProdutoModel, Integer>("Quantidade Contada");
         quantidadeContada.setPrefWidth(200);
         quantidadeContada.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, Integer>("quantidade"));
-        quantidadeContada.setEditable(true);
         quantidadeContada.setCellFactory(TextFieldTableCell.<InventarioProdutoModel,Integer>forTableColumn(new IntegerStringConverter()));
         quantidadeContada.setOnEditCommit(
             (CellEditEvent<InventarioProdutoModel, Integer> t) -> {
-            	((InventarioProdutoModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setQuantidade(t.getNewValue());
+            	int linhaModificada = t.getTablePosition().getRow();
+            	
+            	InventarioProdutoModel itemModificado = (InventarioProdutoModel) t.getTableView().getItems().get(linhaModificada);
+            	itemModificado.setQuantidade(t.getNewValue());
+            	
+            	itemModificado.setQuantidadeDivergencia(itemModificado.getQuantidadeDivergencia());
+            	itemModificado.setTotalCusto(itemModificado.getProduto().getValorCusto().multiply(new BigDecimal(t.getNewValue())));
+            	itemModificado.setTotalVenda(itemModificado.getProduto().getValorVenda().multiply(new BigDecimal(t.getNewValue())));
+            	
+            	t.getTableView().refresh();
+            	
         });
-
-
 
         TableColumn<InventarioProdutoModel, Integer> quantidadeEstoque = new TableColumn<InventarioProdutoModel, Integer>("Quantidade Estoque");
         quantidadeEstoque.setPrefWidth(200);
@@ -103,6 +111,7 @@ public class InventarioMenuItem {
         
         TableColumn<InventarioProdutoModel, Integer> quantidadeDivergencia = new TableColumn<InventarioProdutoModel, Integer>("Divergência");
         quantidadeDivergencia.setPrefWidth(200);
+        quantidadeDivergencia.setEditable(true);
         quantidadeDivergencia.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, Integer>("quantidadeDivergencia"));
         
         TableColumn<InventarioProdutoModel, BigDecimal> valorCusto = new TableColumn<InventarioProdutoModel, BigDecimal>("Valor Custo");
@@ -133,6 +142,8 @@ public class InventarioMenuItem {
        
         table.setItems(conteudoTabela);
         table.getColumns().addAll(codigoCol,nomeCol,codigoProdutoCol,quantidadeContada,quantidadeEstoque,quantidadeDivergencia,valorCusto,totalCusto,valorVenda,totalVenda);
+        
+        
         return table;
 	}
 
