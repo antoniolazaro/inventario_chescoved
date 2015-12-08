@@ -111,7 +111,6 @@ public class MovimentacaoEstoqueMenuItem {
             		}else if(saidaRadioButton.isSelected()){
             			movimentacaoEstoque.setTipoMovimentacaoEstoque(new TipoMovimentacaoEstoqueModel(2L));
             		}
-            		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
             		if(StringUtils.isNotEmpty(dataMovimentacao.getText())){
             			movimentacaoEstoque.setDataMovimentacao(DateUtil.parse(dataMovimentacao.getText()));	
             		}else{

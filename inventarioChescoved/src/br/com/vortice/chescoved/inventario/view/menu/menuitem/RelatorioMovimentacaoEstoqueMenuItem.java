@@ -47,8 +47,6 @@ public class RelatorioMovimentacaoEstoqueMenuItem {
 	private final Label produtoLabel = LabelFactory.getLabelPadrao("Produto");
 	private final Label dataInicioLabel = LabelFactory.getLabelPadrao("Data Início");
 	private final Label dataFimLabel = LabelFactory.getLabelPadrao("Data Fim");
-	private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-	
 	
 	public RelatorioMovimentacaoEstoqueMenuItem() {
 		filtro = new MovimentacaoEstoqueModel();

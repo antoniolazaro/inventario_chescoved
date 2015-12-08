@@ -41,7 +41,6 @@ public class CurvaAbcMenuItem {
 	private CurvaAbcModel curvaAbcModel;
 	private final Label dataInicioLabel = LabelFactory.getLabelPadrao("Data Início");
 	private final Label dataFimLabel = LabelFactory.getLabelPadrao("Data Fim");
-	private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
 	public CurvaAbcMenuItem() {
 		curvaAbcBusiness = new CurvaAbcBusiness();
