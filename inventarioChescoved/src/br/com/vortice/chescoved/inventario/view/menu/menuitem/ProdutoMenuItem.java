@@ -11,6 +11,9 @@ import br.com.vortice.chescoved.inventario.model.ProdutoModel;
 import br.com.vortice.chescoved.inventario.view.HboxFactory;
 import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
+import br.com.vortice.chescoved.inventario.view.custom.MoneyMaskInputTextListener;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -20,6 +23,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -28,6 +32,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.util.Callback;
 
 public class ProdutoMenuItem {
 	
@@ -81,12 +86,21 @@ public class ProdutoMenuItem {
         
         TableColumn<ProdutoModel, String> nomeCol = new TableColumn<ProdutoModel, String>("Nome");
         nomeCol.setMaxWidth(300);
-        nomeCol.setCellValueFactory(new PropertyValueFactory<ProdutoModel, String>("nome"));
+        nomeCol.setCellValueFactory(new Callback<CellDataFeatures<ProdutoModel, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(CellDataFeatures<ProdutoModel, String> p) {
+                return new ReadOnlyObjectWrapper(p.getValue().getNome().toUpperCase());
+            }
+         });
 
         TableColumn<ProdutoModel, String> localEstoqueCol = new TableColumn<ProdutoModel, String>("Local do Estoque");
         localEstoqueCol.setMaxWidth(300);
-        localEstoqueCol.setCellValueFactory(new PropertyValueFactory<ProdutoModel, String>("localEstoque"));
+        localEstoqueCol.setCellValueFactory(new Callback<CellDataFeatures<ProdutoModel, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(CellDataFeatures<ProdutoModel, String> p) {
+                return new ReadOnlyObjectWrapper(p.getValue().getLocalEstoque().toUpperCase());
+            }
+         });
 
+        
         TableColumn<ProdutoModel, Integer> quantidadeCol = new TableColumn<ProdutoModel, Integer>("Quantidade");
         quantidadeCol.setMaxWidth(150);
         quantidadeCol.setCellValueFactory(new PropertyValueFactory<ProdutoModel, Integer>("quantidade"));
@@ -149,7 +163,7 @@ public class ProdutoMenuItem {
                     return true;
                 }
 
-                if (produto.getNome().contains(newValue.toUpperCase())) {
+                if (produto.getNome().toUpperCase().contains(newValue.toUpperCase())) {
                     return true; // Filter matches first name.
                 }
                 return false; // Does not match.
@@ -162,7 +176,7 @@ public class ProdutoMenuItem {
                     return true;
                 }
 
-                if (produto.getLocalEstoque().contains(newValue.toUpperCase())) {
+                if (produto.getLocalEstoque().toUpperCase().contains(newValue.toUpperCase())) {
                     return true; // Filter matches first name.
                 }
                 return false; // Does not match.
@@ -198,11 +212,15 @@ public class ProdutoMenuItem {
         
         valorCusto.setPromptText("Valor Custo");
         valorCusto.setMaxWidth(200);
+        valorCusto.lengthProperty().addListener(new MoneyMaskInputTextListener(valorCusto));
+        
         hb = HboxFactory.getHBoxPadrao(valorCustoLabel, valorCusto);
 		vb.getChildren().add(hb);
         
         valorVenda.setPromptText("Valor Venda");
         valorVenda.setMaxWidth(200);
+        valorVenda.lengthProperty().addListener(new MoneyMaskInputTextListener(valorVenda));
+
         hb = HboxFactory.getHBoxPadrao(valorVendaLabel, valorVenda);
 		vb.getChildren().add(hb);
         
@@ -229,7 +247,7 @@ public class ProdutoMenuItem {
             			ShowAlertUtil.exibirMensagemErro("Campo valor de venda é obrigatório.");
             		}
             		
-	            	ProdutoModel produtoModel = new ProdutoModel(Long.valueOf(codigo.getText()),nome.getText(),localEstoque.getText(),new BigDecimal(valorCusto.getText()),new BigDecimal(valorVenda.getText()));
+	            	ProdutoModel produtoModel = new ProdutoModel(Long.valueOf(codigo.getText()),nome.getText(),localEstoque.getText(),new BigDecimal(valorCusto.getText().replaceAll("R$ ","")),new BigDecimal(valorVenda.getText().replaceAll("R$ ","")));
 	            	if(produtoBusiness.insertOrUpdate(produtoModel)){
 	            		conteudoTabela.add(produtoModel);	
 	            	}else{
