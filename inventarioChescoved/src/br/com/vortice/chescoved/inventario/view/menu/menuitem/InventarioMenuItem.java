@@ -24,18 +24,19 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
+import javafx.util.converter.IntegerStringConverter;
 
 public class InventarioMenuItem {
 	
@@ -84,17 +85,14 @@ public class InventarioMenuItem {
             }
          });
 
-        TableColumn<InventarioProdutoModel, String> quantidadeContada = new TableColumn<InventarioProdutoModel, String>("Quantidade Contada");
+        TableColumn<InventarioProdutoModel, Integer> quantidadeContada = new TableColumn<InventarioProdutoModel, Integer>("Quantidade Contada");
         quantidadeContada.setPrefWidth(200);
-        quantidadeContada.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, String>("quantidade"));
+        quantidadeContada.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, Integer>("quantidade"));
         quantidadeContada.setEditable(true);
-//        quantidadeContada.setCellFactory(TextFieldTableCell.<InventarioProdutoModel>forTableColumn());  
-        Callback<TableColumn<InventarioProdutoModel, String>,TableCell<InventarioProdutoModel, String>> cellFactory = (TableColumn<InventarioProdutoModel, String> p) -> new EditingCell();
-
-        quantidadeContada.setCellFactory(cellFactory);   
+        quantidadeContada.setCellFactory(TextFieldTableCell.<InventarioProdutoModel,Integer>forTableColumn(new IntegerStringConverter()));
         quantidadeContada.setOnEditCommit(
-            (CellEditEvent<InventarioProdutoModel, String> t) -> {
-                ((InventarioProdutoModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setQuantidade(Integer.valueOf(t.getNewValue()));
+            (CellEditEvent<InventarioProdutoModel, Integer> t) -> {
+            	((InventarioProdutoModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setQuantidade(t.getNewValue());
         });
 
 
@@ -154,8 +152,6 @@ public class InventarioMenuItem {
             @Override
             public void handle(ActionEvent e) {
             	try{
-            		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            		simpleDateFormat.setLenient(false);
             		if(StringUtils.isNotEmpty(dataInventarioText.getText())){
             			inventario.setDataInventario(DateUtil.parse(dataInventarioText.getText()));	
             		}else{
@@ -229,70 +225,5 @@ public class InventarioMenuItem {
         root.setCenter(vbox);
 
 	}
-	
-	class EditingCell extends TableCell<InventarioProdutoModel, String> {
-		 
-        private TextField textField;
- 
-        public EditingCell() {
-        }
- 
-        @Override
-        public void startEdit() {
-            if (!isEmpty()) {
-                super.startEdit();
-                createTextField();
-                setText(null);
-                setGraphic(textField);
-                textField.selectAll();
-            }
-            textField.requestFocus();
-        }
- 
-        @Override
-        public void cancelEdit() {
-            super.cancelEdit();
- 
-            setText((String) getItem());
-            setGraphic(null);
-        }
- 
-        @Override
-        public void updateItem(String item, boolean empty) {
-            super.updateItem(item, empty);
- 
-            if (empty) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                if (isEditing()) {
-                    if (textField != null) {
-                        textField.setText(getString());
-                    }
-                    setText(null);
-                    setGraphic(textField);
-                } else {
-                    setText(getString());
-                    setGraphic(null);
-                }
-            }
-        }
- 
-        private void createTextField() {
-            textField = new TextField(getString());
-            textField.setMinWidth(this.getWidth() - this.getGraphicTextGap()* 2);
-            textField.focusedProperty().addListener(
-                (ObservableValue<? extends Boolean> arg0, 
-                Boolean arg1, Boolean arg2) -> {
-                    if (!arg2) {
-                        commitEdit(textField.getText());
-                    }
-            });
-        }
- 
-        private String getString() {
-            return getItem() == null ? "" : getItem().toString();
-        }
-    }
 
 }
