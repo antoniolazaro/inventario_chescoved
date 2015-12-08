@@ -26,6 +26,7 @@ public class CurvaAbcBusiness{
 			
 			List<CurvaAbcModel> listaCurvaAbcFinal = new ArrayList<CurvaAbcModel>();
 			ProdutoModel produto = listaCurvaAbc.get(0).getProduto();
+			listaCurvaAbcFinal.add(listaCurvaAbc.get(0));
 			Long codigoProdutoAtual = produto.getCodigo();
 			Integer quantidadeTotal = 0;
 			BigDecimal valorTotal = new BigDecimal(0);
