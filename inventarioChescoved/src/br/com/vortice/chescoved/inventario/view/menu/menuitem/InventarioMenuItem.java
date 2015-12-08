@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -92,16 +93,23 @@ public class InventarioMenuItem {
         quantidadeContada.setCellFactory(TextFieldTableCell.<InventarioProdutoModel,Integer>forTableColumn(new IntegerStringConverter()));
         quantidadeContada.setOnEditCommit(
             (CellEditEvent<InventarioProdutoModel, Integer> t) -> {
+            	
+            	TableView<InventarioProdutoModel> tableViewProdutos = t.getTableView();
             	int linhaModificada = t.getTablePosition().getRow();
             	
-            	InventarioProdutoModel itemModificado = (InventarioProdutoModel) t.getTableView().getItems().get(linhaModificada);
+            	InventarioProdutoModel itemModificado = (InventarioProdutoModel) tableViewProdutos.getItems().get(linhaModificada);
             	itemModificado.setQuantidade(t.getNewValue());
             	
             	itemModificado.setQuantidadeDivergencia(itemModificado.getQuantidadeDivergencia());
             	itemModificado.setTotalCusto(itemModificado.getProduto().getValorCusto().multiply(new BigDecimal(t.getNewValue())));
             	itemModificado.setTotalVenda(itemModificado.getProduto().getValorVenda().multiply(new BigDecimal(t.getNewValue())));
             	
-            	t.getTableView().refresh();
+            	tableViewProdutos.refresh();
+            
+            	tableViewProdutos.getSelectionModel().select(linhaModificada+1);
+            	
+            	tableViewProdutos.focusModelProperty().get().focus(4);
+            	table.requestFocus();
             	
         });
 
