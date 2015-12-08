@@ -32,3 +32,5 @@ quantidade_final int);
 ALTER TABLE inventario_produto ADD CONSTRAINT FK_PROD_INV FOREIGN KEY (produto_codigo) REFERENCES PRODUTO(CODIGO);
 ALTER TABLE inventario_produto ADD CONSTRAINT FK_INV_PROD_INV FOREIGN KEY (inventario_codigo) REFERENCES inventario(CODIGO);
 
+CREATE TABLE IF NOT EXISTS usuario(codigo bigint auto_increment primary key,login varchar(50),senha varchar(50));
+ALTER TABLE usuario ADD CONSTRAINT login_unique UNIQUE(login);

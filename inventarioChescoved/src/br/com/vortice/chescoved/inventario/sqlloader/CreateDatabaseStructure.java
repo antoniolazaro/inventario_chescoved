@@ -1,6 +1,5 @@
 package br.com.vortice.chescoved.inventario.sqlloader;
 
-import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 
