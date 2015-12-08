@@ -1,7 +1,6 @@
 package br.com.vortice.chescoved.inventario.view.menu.menuitem;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +51,9 @@ public class CurvaAbcMenuItem {
 
         table.setEditable(false);
         
-        TableColumn<CurvaAbcModel, BigDecimal> totalCusto = new TableColumn<CurvaAbcModel, BigDecimal>("Classificação");
+        TableColumn<CurvaAbcModel, String> totalCusto = new TableColumn<CurvaAbcModel, String>("Percentual Saída");
         totalCusto.setPrefWidth(150);
-        totalCusto.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, BigDecimal>("classificacaoCurvaABC"));
+        totalCusto.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, String>("percentualSaida"));
         
         TableColumn<CurvaAbcModel, String> nomeCol = new TableColumn<CurvaAbcModel, String>("Produto");
         nomeCol.setPrefWidth(300);

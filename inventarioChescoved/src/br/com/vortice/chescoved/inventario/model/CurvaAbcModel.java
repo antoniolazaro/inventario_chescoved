@@ -6,6 +6,7 @@ import java.util.Date;
 public class CurvaAbcModel {
 	
 	private String classificacaoCurvaABC;
+	private String percentualSaida;
 	private Date dataInicio;
 	private Date dataFim;
 	private ProdutoModel produto;
@@ -54,5 +55,11 @@ public class CurvaAbcModel {
 	}
 	public void setClassificacaoCurvaABC(String classificacaoCurvaABC) {
 		this.classificacaoCurvaABC = classificacaoCurvaABC;
+	}
+	public String getPercentualSaida() {
+		return percentualSaida;
+	}
+	public void setPercentualSaida(String percentualSaida) {
+		this.percentualSaida = percentualSaida;
 	}
 }

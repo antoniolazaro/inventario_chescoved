@@ -24,9 +24,9 @@ public class CurvaAbcBusiness{
 				valorTotalMovimentacoes.add(curvaAbc.getValorTotal());
 			}
 			
-			List<CurvaAbcModel> listaCurvaAbcFinal = new ArrayList<CurvaAbcModel>();
+			List<CurvaAbcModel> listaProdutosAgrupadosPorMovimentacaoSaida = new ArrayList<CurvaAbcModel>();
 			ProdutoModel produto = listaCurvaAbc.get(0).getProduto();
-			listaCurvaAbcFinal.add(listaCurvaAbc.get(0));
+			listaProdutosAgrupadosPorMovimentacaoSaida.add(listaCurvaAbc.get(0));
 			Long codigoProdutoAtual = produto.getCodigo();
 			Integer quantidadeTotal = 0;
 			BigDecimal valorTotal = new BigDecimal(0);
@@ -36,17 +36,28 @@ public class CurvaAbcBusiness{
 					curvaAbcAgrupado.setProduto(curvaAbc.getProduto());
 					curvaAbcAgrupado.setQuantidade(quantidadeTotal);
 					curvaAbcAgrupado.setValorUnitario(valorTotal);
-					listaCurvaAbcFinal.add(curvaAbc);
+					listaProdutosAgrupadosPorMovimentacaoSaida.add(curvaAbc);
 					quantidadeTotal = 0;
 					valorTotal = new BigDecimal(0);
 				}
 				quantidadeTotal+=curvaAbc.getQuantidade();
 				valorTotal.add(curvaAbc.getValorUnitario());
 			}
-			return listaCurvaAbcFinal;		
+			
+			List<CurvaAbcModel> listaProdutosFinais = new ArrayList<CurvaAbcModel>();
+			for(CurvaAbcModel curvaAbc:listaCurvaAbc){
+				curvaAbc.setPercentualSaida(calcularValorPercentual(curvaAbc,valorTotalMovimentacoes)+"%");
+				listaProdutosFinais.add(curvaAbc);
+			}
+			
+			return listaProdutosFinais;		
 		}else{
 			throw new Exception("Não há movimentação para esse período.");
 		}
+	}
+	
+	private String calcularValorPercentual(CurvaAbcModel curvaAbc,BigDecimal valorTotalMovimentacoes){
+		return (curvaAbc.getValorTotal().divide(valorTotalMovimentacoes).multiply(new BigDecimal(100))).setScale(2).toString();
 	}
 
 	
