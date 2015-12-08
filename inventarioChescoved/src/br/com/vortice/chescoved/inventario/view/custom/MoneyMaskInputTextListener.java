@@ -20,9 +20,8 @@ public class MoneyMaskInputTextListener extends ComponentCustomAb implements Cha
         value = value.replaceAll("([0-9]{1})([0-9]{8})$", "$1.$2");
         value = value.replaceAll("([0-9]{1})([0-9]{5})$", "$1.$2");
         value = value.replaceAll("([0-9]{1})([0-9]{2})$", "$1,$2");
-		input+="R$ "+value;
         
-        return value;
+        return "R$ "+value;
 	}
 	
 	@Override
