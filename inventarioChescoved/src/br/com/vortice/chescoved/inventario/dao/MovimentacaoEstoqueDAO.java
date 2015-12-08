@@ -47,7 +47,7 @@ public class MovimentacaoEstoqueDAO extends DAOAb {
         PreparedStatement stmt = null;
         ResultSet rs = null;
       
-        StringBuilder sql = new StringBuilder("SELECT mp.produto_codigo,mp.quantidade,produto.valor_custo,produto.nome, ");
+        StringBuilder sql = new StringBuilder("SELECT mp.produto_codigo,mp.quantidade,produto.valor_custo,produto.nome,mp.nota_fiscal, ");
         sql.append(" mp.tipo_movimentacao_codigo,tipo_movimentacao.nome as nome_movimentacao,mp.data_movimentacao,mp.data_recebimento_produto ")
         .append(" from movimentacao_produto mp, produto,tipo_movimentacao ")
         .append(" where mp.produto_codigo = produto.codigo ")
@@ -80,6 +80,7 @@ public class MovimentacaoEstoqueDAO extends DAOAb {
             	movimentacao.setTipoMovimentacaoEstoque(new TipoMovimentacaoEstoqueModel(rs.getLong("tipo_movimentacao_codigo")));
             	movimentacao.getTipoMovimentacaoEstoque().setNome(rs.getString("nome_movimentacao"));
             	movimentacao.getProduto().setNome(rs.getString("nome"));
+            	movimentacao.setNotaFiscal(rs.getString("nota_fiscal"));
             	movimentacao.setDataMovimentacao(rs.getTimestamp("data_movimentacao"));
             	movimentacao.setDataRecebimento(rs.getTimestamp("data_recebimento_produto"));
             	lista.add(movimentacao);
