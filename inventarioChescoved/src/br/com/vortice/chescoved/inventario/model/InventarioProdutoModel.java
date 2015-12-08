@@ -55,7 +55,7 @@ public class InventarioProdutoModel {
 	
 	public Integer getQuantidadeDivergencia() {
 		if(quantidadeEstoque != null && quantidade != null){
-			return quantidadeEstoque-quantidade;
+			return quantidade-quantidadeEstoque;
 		}else if(quantidade != null){
 			return quantidade;
 		}else if(quantidadeEstoque != null){
