@@ -22,6 +22,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -43,7 +44,7 @@ public class InventarioMenuItem {
 	private TableView<InventarioProdutoModel> table;
 	private List<InventarioProdutoModel> listaProdutos;
 	private final Label dataInventarioLabel = LabelFactory.getLabelPadrao("Data do Inventário");
-	private final Button addButton = new Button("Confirmar Inventário");
+	private final Button confirmarInventarioButton = new Button("Confirmar Inventário");
 	 
 	public InventarioMenuItem() {
 		inventarioBusiness = new InventarioBusiness();
@@ -84,12 +85,13 @@ public class InventarioMenuItem {
         quantidadeContada.setPrefWidth(200);
         quantidadeContada.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, String>("quantidade"));
         quantidadeContada.setEditable(true);
-        quantidadeContada.setCellFactory(TextFieldTableCell.<InventarioProdutoModel>forTableColumn());
+//        quantidadeContada.setCellFactory(TextFieldTableCell.<InventarioProdutoModel>forTableColumn());  
+        Callback<TableColumn<InventarioProdutoModel, String>,TableCell<InventarioProdutoModel, String>> cellFactory = (TableColumn<InventarioProdutoModel, String> p) -> new EditingCell();
+
+        quantidadeContada.setCellFactory(cellFactory);   
         quantidadeContada.setOnEditCommit(
             (CellEditEvent<InventarioProdutoModel, String> t) -> {
-                ((InventarioProdutoModel) t.getTableView().getItems().get(
-                        t.getTablePosition().getRow())
-                        ).setQuantidade(Integer.valueOf(t.getNewValue()));
+                ((InventarioProdutoModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setQuantidade(Integer.valueOf(t.getNewValue()));
         });
 
 
@@ -143,9 +145,9 @@ public class InventarioMenuItem {
 		HBox hb = HboxFactory.getHBoxPadrao(dataInventarioLabel, dataInventario);
 		vb.getChildren().add(hb);
        
-        final Button addButton = new Button("Criar Inventário");
+        final Button criarInventarioButton = new Button("Criar Inventário"); 
         
-        addButton.setOnAction(new EventHandler<ActionEvent>() {
+        criarInventarioButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
             	try{
@@ -164,14 +166,14 @@ public class InventarioMenuItem {
         	        conteudoTabela = FXCollections.observableArrayList(listaProdutos);
         	        table.setItems(conteudoTabela);
             		table.setVisible(true);
-            		addButton.setVisible(true);
+            		confirmarInventarioButton.setVisible(true);
             	}catch(Exception ex){
             		ShowAlertUtil.exibirMensagemErro("Erro: "+ex.getMessage());
                 }
             }
         });
         
-        vb.getChildren().add(addButton);
+        vb.getChildren().add(criarInventarioButton);
         
         return vb;
 	}
@@ -184,7 +186,7 @@ public class InventarioMenuItem {
         table = createTableView();
         table.setVisible(false);
         
-        addButton.setOnAction(new EventHandler<ActionEvent>() {
+        confirmarInventarioButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
             	try{
@@ -196,12 +198,78 @@ public class InventarioMenuItem {
                 }
             }
         });
-        addButton.setVisible(false);
+        confirmarInventarioButton.setVisible(false);
         
         final VBox vbox = new VBox();
-        vbox.getChildren().addAll(label,pesquisar,table,addButton);
+        vbox.getChildren().addAll(label,pesquisar,table,confirmarInventarioButton);
  
         root.setCenter(vbox);
 
 	}
+	
+	class EditingCell extends TableCell<InventarioProdutoModel, String> {
+		 
+        private TextField textField;
+ 
+        public EditingCell() {
+        }
+ 
+        @Override
+        public void startEdit() {
+            if (!isEmpty()) {
+                super.startEdit();
+                createTextField();
+                setText(null);
+                setGraphic(textField);
+                textField.selectAll();
+            }
+            textField.requestFocus();
+        }
+ 
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+ 
+            setText((String) getItem());
+            setGraphic(null);
+        }
+ 
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+ 
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                if (isEditing()) {
+                    if (textField != null) {
+                        textField.setText(getString());
+                    }
+                    setText(null);
+                    setGraphic(textField);
+                } else {
+                    setText(getString());
+                    setGraphic(null);
+                }
+            }
+        }
+ 
+        private void createTextField() {
+            textField = new TextField(getString());
+            textField.setMinWidth(this.getWidth() - this.getGraphicTextGap()* 2);
+            textField.focusedProperty().addListener(
+                (ObservableValue<? extends Boolean> arg0, 
+                Boolean arg1, Boolean arg2) -> {
+                    if (!arg2) {
+                        commitEdit(textField.getText());
+                    }
+            });
+        }
+ 
+        private String getString() {
+            return getItem() == null ? "" : getItem().toString();
+        }
+    }
+
 }
