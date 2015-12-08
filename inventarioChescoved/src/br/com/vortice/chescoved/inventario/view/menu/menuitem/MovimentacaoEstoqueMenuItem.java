@@ -9,10 +9,12 @@ import br.com.vortice.chescoved.inventario.business.ProdutoBusiness;
 import br.com.vortice.chescoved.inventario.model.MovimentacaoEstoqueModel;
 import br.com.vortice.chescoved.inventario.model.ProdutoModel;
 import br.com.vortice.chescoved.inventario.model.TipoMovimentacaoEstoqueModel;
+import br.com.vortice.chescoved.inventario.util.DateUtil;
 import br.com.vortice.chescoved.inventario.view.AutoCompleteComboBoxListener;
 import br.com.vortice.chescoved.inventario.view.HboxFactory;
 import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
+import br.com.vortice.chescoved.inventario.view.custom.DateMaskInputTextListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -65,6 +67,7 @@ public class MovimentacaoEstoqueMenuItem {
 		final TextField dataMovimentacao = new TextField();
         dataMovimentacao.setPromptText("Data de movimentação");
         dataMovimentacao.setMaxWidth(100);
+        dataMovimentacao.lengthProperty().addListener(new DateMaskInputTextListener(dataMovimentacao));
         hb = HboxFactory.getHBoxPadrao(dataMovimentacaoLabel, dataMovimentacao);
         vb.getChildren().add(hb);
         
@@ -90,6 +93,7 @@ public class MovimentacaoEstoqueMenuItem {
         final TextField dataRecebimento = new TextField();
         dataRecebimento.setPromptText("Data Recebimento");
         dataRecebimento.setMaxWidth(100);
+        dataRecebimento.lengthProperty().addListener(new DateMaskInputTextListener(dataRecebimento));
         hb = HboxFactory.getHBoxPadrao(dataRecebimentoLabel, dataRecebimento);
         vb.getChildren().add(hb);
         
@@ -109,7 +113,7 @@ public class MovimentacaoEstoqueMenuItem {
             		}
             		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
             		if(StringUtils.isNotEmpty(dataMovimentacao.getText())){
-            			movimentacaoEstoque.setDataMovimentacao(simpleDateFormat.parse(dataMovimentacao.getText()));	
+            			movimentacaoEstoque.setDataMovimentacao(DateUtil.parse(dataMovimentacao.getText()));	
             		}else{
             			ShowAlertUtil.exibirMensagemErro("Campo data de movimentação é obrigatório.");
             		}
@@ -123,7 +127,7 @@ public class MovimentacaoEstoqueMenuItem {
             			movimentacaoEstoque.setNotaFiscal(notaFiscal.getText());
             		}
             		if(StringUtils.isNotEmpty(dataRecebimento.getText())){
-            			movimentacaoEstoque.setDataRecebimento(simpleDateFormat.parse(dataRecebimento.getText()));	
+            			movimentacaoEstoque.setDataRecebimento(DateUtil.parse(dataRecebimento.getText()));	
             		}
             		if(comboBox.getValue() != null){
             			movimentacaoEstoque.setProduto(comboBox.getValue());

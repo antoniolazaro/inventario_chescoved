@@ -9,9 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import br.com.vortice.chescoved.inventario.business.CurvaAbcBusiness;
 import br.com.vortice.chescoved.inventario.model.CurvaAbcModel;
+import br.com.vortice.chescoved.inventario.util.DateUtil;
 import br.com.vortice.chescoved.inventario.view.HboxFactory;
 import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
+import br.com.vortice.chescoved.inventario.view.custom.DateMaskInputTextListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -97,12 +99,14 @@ public class CurvaAbcMenuItem {
 		final TextField dataInicio = new TextField();
 		dataInicio.setPromptText("Data Início");
 		dataInicio.setPrefWidth(100);
+		dataInicio.lengthProperty().addListener(new DateMaskInputTextListener(dataInicio));
 		HBox hb = HboxFactory.getHBoxPadrao(dataInicioLabel, dataInicio);
 		vb.getChildren().add(hb);
 		
 		final TextField dataFim = new TextField();
 		dataFim.setPromptText("Data Fim");
 		dataFim.setPrefWidth(100);
+		dataFim.lengthProperty().addListener(new DateMaskInputTextListener(dataFim));
 		hb = HboxFactory.getHBoxPadrao(dataFimLabel, dataFim);
 		vb.getChildren().add(hb);
 		
@@ -114,12 +118,12 @@ public class CurvaAbcMenuItem {
             	try{
             		
             		if(StringUtils.isNotEmpty(dataInicio.getText())){
-            			curvaAbcModel.setDataInicio(simpleDateFormat.parse(dataInicio.getText()));	
+            			curvaAbcModel.setDataInicio(DateUtil.parse(dataInicio.getText()));	
             		}else{
             			ShowAlertUtil.exibirMensagemErro("Campo data início é obrigatório.");
             		}
             		if(StringUtils.isNotEmpty(dataFim.getText())){
-            			curvaAbcModel.setDataFim(simpleDateFormat.parse(dataFim.getText()));	
+            			curvaAbcModel.setDataFim(DateUtil.parse(dataFim.getText()));	
             		}else{
             			ShowAlertUtil.exibirMensagemErro("Campo data fim é obrigatório.");
             		}

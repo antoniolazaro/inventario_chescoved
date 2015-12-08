@@ -11,9 +11,11 @@ import org.apache.commons.lang3.StringUtils;
 import br.com.vortice.chescoved.inventario.business.InventarioBusiness;
 import br.com.vortice.chescoved.inventario.model.InventarioModel;
 import br.com.vortice.chescoved.inventario.model.InventarioProdutoModel;
+import br.com.vortice.chescoved.inventario.util.DateUtil;
 import br.com.vortice.chescoved.inventario.view.HboxFactory;
 import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
+import br.com.vortice.chescoved.inventario.view.custom.DateMaskInputTextListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -29,7 +31,6 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -45,6 +46,8 @@ public class InventarioMenuItem {
 	private List<InventarioProdutoModel> listaProdutos;
 	private final Label dataInventarioLabel = LabelFactory.getLabelPadrao("Data do Inventário");
 	private final Button confirmarInventarioButton = new Button("Confirmar Inventário");
+	private final Button cancelarInventarioButton = new Button("Cancelar Inventário");
+	private final TextField dataInventarioText = new TextField();
 	 
 	public InventarioMenuItem() {
 		inventarioBusiness = new InventarioBusiness();
@@ -139,10 +142,10 @@ public class InventarioMenuItem {
 	private VBox createFiltroProduto(){
 		final VBox vb = new VBox();
         
-		final TextField dataInventario = new TextField();
-		dataInventario.setPromptText("Data do Inventário");
-		dataInventario.setMaxWidth(100);
-		HBox hb = HboxFactory.getHBoxPadrao(dataInventarioLabel, dataInventario);
+		dataInventarioText.setPromptText("Data do Inventário");
+		dataInventarioText.setMaxWidth(100);
+		dataInventarioText.lengthProperty().addListener(new DateMaskInputTextListener(dataInventarioText));
+		HBox hb = HboxFactory.getHBoxPadrao(dataInventarioLabel, dataInventarioText);
 		vb.getChildren().add(hb);
        
         final Button criarInventarioButton = new Button("Criar Inventário"); 
@@ -152,9 +155,9 @@ public class InventarioMenuItem {
             public void handle(ActionEvent e) {
             	try{
             		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            		
-            		if(StringUtils.isNotEmpty(dataInventario.getText())){
-            			inventario.setDataInventario(simpleDateFormat.parse(dataInventario.getText()));	
+            		simpleDateFormat.setLenient(false);
+            		if(StringUtils.isNotEmpty(dataInventarioText.getText())){
+            			inventario.setDataInventario(DateUtil.parse(dataInventarioText.getText()));	
             		}else{
             			ShowAlertUtil.exibirMensagemErro("Campo data do inventário é obrigatório.");
             		}
@@ -167,6 +170,7 @@ public class InventarioMenuItem {
         	        table.setItems(conteudoTabela);
             		table.setVisible(true);
             		confirmarInventarioButton.setVisible(true);
+            		cancelarInventarioButton.setVisible(true);
             	}catch(Exception ex){
             		ShowAlertUtil.exibirMensagemErro("Erro: "+ex.getMessage());
                 }
@@ -200,8 +204,27 @@ public class InventarioMenuItem {
         });
         confirmarInventarioButton.setVisible(false);
         
+        cancelarInventarioButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+            	try{
+            		listaProdutos = new ArrayList<InventarioProdutoModel>();
+			        conteudoTabela = FXCollections.observableArrayList(listaProdutos);
+			        table.setItems(conteudoTabela);
+			        dataInventarioText.setText("");
+		    		table.setVisible(false);
+		    		confirmarInventarioButton.setVisible(false);
+		    		cancelarInventarioButton.setVisible(false);
+            		ShowAlertUtil.exibirMensagemInfo("Inventário cancelado com sucesso. ");
+            	}catch(Exception ex){
+            		ShowAlertUtil.exibirMensagemErro("Erro: "+ex.getMessage());
+                }
+            }
+        });
+        cancelarInventarioButton.setVisible(false);
+        
         final VBox vbox = new VBox();
-        vbox.getChildren().addAll(label,pesquisar,table,confirmarInventarioButton);
+        vbox.getChildren().addAll(label,pesquisar,table,confirmarInventarioButton,cancelarInventarioButton);
  
         root.setCenter(vbox);
 

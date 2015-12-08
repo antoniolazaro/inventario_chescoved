@@ -11,10 +11,12 @@ import br.com.vortice.chescoved.inventario.business.MovimentacaoEstoqueBusiness;
 import br.com.vortice.chescoved.inventario.business.ProdutoBusiness;
 import br.com.vortice.chescoved.inventario.model.MovimentacaoEstoqueModel;
 import br.com.vortice.chescoved.inventario.model.ProdutoModel;
+import br.com.vortice.chescoved.inventario.util.DateUtil;
 import br.com.vortice.chescoved.inventario.view.AutoCompleteComboBoxListener;
 import br.com.vortice.chescoved.inventario.view.HboxFactory;
 import br.com.vortice.chescoved.inventario.view.LabelFactory;
 import br.com.vortice.chescoved.inventario.view.ShowAlertUtil;
+import br.com.vortice.chescoved.inventario.view.custom.DateMaskInputTextListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -127,12 +129,14 @@ public class RelatorioMovimentacaoEstoqueMenuItem {
 		final TextField dataInicio = new TextField();
 		dataInicio.setPromptText("Data Início");
 		dataInicio.setPrefWidth(100);
+		dataInicio.lengthProperty().addListener(new DateMaskInputTextListener(dataInicio));
 		HBox hb = HboxFactory.getHBoxPadrao(dataInicioLabel, dataInicio);
 		vb.getChildren().add(hb);
 		
 		final TextField dataFim = new TextField();
 		dataFim.setPromptText("Data Fim");
 		dataFim.setPrefWidth(100);
+		dataFim.lengthProperty().addListener(new DateMaskInputTextListener(dataFim));
 		hb = HboxFactory.getHBoxPadrao(dataFimLabel, dataFim);
 		vb.getChildren().add(hb);
 		
@@ -154,13 +158,13 @@ public class RelatorioMovimentacaoEstoqueMenuItem {
             		
             		filtro.setProduto(comboBox.getValue());
             		if(StringUtils.isNotEmpty(dataInicio.getText())){
-            			filtro.setDataInicio(simpleDateFormat.parse(dataInicio.getText()));	
+            			filtro.setDataInicio(DateUtil.parse(dataInicio.getText()));	
             		}else{
             			ShowAlertUtil.exibirMensagemErro("Campo data início é obrigatório.");
             			return;
             		}
             		if(StringUtils.isNotEmpty(dataFim.getText())){
-            			filtro.setDataFim(simpleDateFormat.parse(dataFim.getText()));	
+            			filtro.setDataFim(DateUtil.parse(dataFim.getText()));	
             		}else{
             			ShowAlertUtil.exibirMensagemErro("Campo data fim é obrigatório.");
             			return;
