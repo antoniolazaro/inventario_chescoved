@@ -13,7 +13,7 @@ public class UsuarioDAO extends DAOAb {
         PreparedStatement stmt = null;
         ResultSet rs = null;
       
-        String sql = "select codigo,login,senha from usuario where upper(login) = ? and senha = ?";
+        String sql = "select codigo,login,senha from usuario where upper(login) = UPPER(?) and senha = ?";
         try {
         	stmt = connection.prepareStatement(sql);
         	stmt.setString(1, usuario.getLogin());
