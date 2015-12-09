@@ -37,7 +37,7 @@ public class MenuBuilder {
 	    Menu sair = new Menu("Sair");
 	    sair.setOnAction(actionEvent -> Platform.exit());
 	    
-	    menuBar.getMenus().addAll(produtoMenu,arcMenu,materialInternoMenu,sair);
+	    menuBar.getMenus().addAll(produtoMenu,arcMenu,materialInternoMenu);
 	}
 
 	protected Menu menuEstoquePrincipal() {
