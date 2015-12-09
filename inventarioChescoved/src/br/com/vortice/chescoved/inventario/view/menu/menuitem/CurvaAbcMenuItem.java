@@ -51,7 +51,7 @@ public class CurvaAbcMenuItem {
 
         table.setEditable(false);
         
-        TableColumn<CurvaAbcModel, String> totalCusto = new TableColumn<CurvaAbcModel, String>("Percentual Saída");
+        TableColumn<CurvaAbcModel, String> totalCusto = new TableColumn<CurvaAbcModel, String>("Classificação");
         totalCusto.setPrefWidth(150);
         totalCusto.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, String>("percentualSaida"));
         
@@ -79,7 +79,7 @@ public class CurvaAbcMenuItem {
         quantidadeDivergencia.setPrefWidth(150);
         quantidadeDivergencia.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, BigDecimal>("valorUnitario"));
         
-        TableColumn<CurvaAbcModel, Integer> quantidadeFinal = new TableColumn<CurvaAbcModel, Integer>("Valor Total");
+        TableColumn<CurvaAbcModel, Integer> quantidadeFinal = new TableColumn<CurvaAbcModel, Integer>("Custo Total");
         quantidadeFinal.setPrefWidth(150);
         quantidadeFinal.setCellValueFactory(new PropertyValueFactory<CurvaAbcModel, Integer>("valorTotal"));
         
@@ -145,7 +145,7 @@ public class CurvaAbcMenuItem {
 	
 	
 	public void buildMenuItem(BorderPane root){
-	    final Label label = new Label("Curva ABC");
+	    final Label label = new Label("ESTOQUE PRINCIPAL > CURVA ABC");
         label.setFont(new Font("Arial", 20));
 
         VBox pesquisar = createFiltroProduto();

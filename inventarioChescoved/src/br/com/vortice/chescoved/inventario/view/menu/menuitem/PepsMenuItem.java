@@ -153,7 +153,7 @@ public class PepsMenuItem {
 	
 	
 	public void buildMenuItem(BorderPane root){
-	    final Label label = new Label("PEPS");
+	    final Label label = new Label("ESTOQUE PRINCIPAL > PEPS");
         label.setFont(new Font("Arial", 20));
 
         VBox pesquisar = null;

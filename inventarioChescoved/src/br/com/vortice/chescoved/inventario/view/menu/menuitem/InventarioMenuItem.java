@@ -101,8 +101,8 @@ public class InventarioMenuItem {
             	itemModificado.setQuantidade(t.getNewValue());
             	
             	itemModificado.setQuantidadeDivergencia(itemModificado.getQuantidadeDivergencia());
-            	itemModificado.setTotalCusto(itemModificado.getProduto().getValorCusto().multiply(new BigDecimal(t.getNewValue())));
-            	itemModificado.setTotalVenda(itemModificado.getProduto().getValorVenda().multiply(new BigDecimal(t.getNewValue())));
+            	itemModificado.setTotalCusto(itemModificado.getProduto().getValorCusto().multiply(new BigDecimal(itemModificado.getQuantidadeDivergencia())));
+            	itemModificado.setTotalVenda(itemModificado.getProduto().getValorVenda().multiply(new BigDecimal(itemModificado.getQuantidadeDivergencia())));
             	
             	tableViewProdutos.refresh();
             
@@ -198,7 +198,7 @@ public class InventarioMenuItem {
 	}
 	
 	public void buildMenuItem(BorderPane root){
-	    final Label label = new Label("Inventário");
+	    final Label label = new Label("ESTOQUE PRINCIPAL > INVENTÁRIO");
         label.setFont(new Font("Arial", 20));
 
         VBox pesquisar = createFiltroProduto();

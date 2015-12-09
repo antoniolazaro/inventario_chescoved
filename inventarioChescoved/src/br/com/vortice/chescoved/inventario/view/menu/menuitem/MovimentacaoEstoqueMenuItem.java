@@ -156,7 +156,7 @@ public class MovimentacaoEstoqueMenuItem {
 	
 
 	public void buildMenuItem(BorderPane root) {
-	    final Label label = new Label("Estoque Principal -> Movimentação de Estoque");
+	    final Label label = new Label("ESTOQUE PRINCIPAL > MOVIMENTAÇÃO DE ESTOQUE");
         label.setFont(new Font("Arial", 20));
 
         try{

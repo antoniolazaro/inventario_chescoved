@@ -20,6 +20,8 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -29,6 +31,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -296,16 +299,34 @@ public class ProdutoMenuItem {
 	}
 
 	public void buildMenuItem(BorderPane root){
-	    final Label label = new Label("Lista Produtos");
+	    final Label label = new Label("ESTOQUE PRINCIPAL > CONSULTA DE PRODUTOS");
         label.setFont(new Font("Arial", 20));
 
         VBox pesquisar = createFiltroProduto();
-        TableView<ProdutoModel> table = createTableView();
-        VBox adicionarPalleteSection = createAdicionarProduto();
+        VBox blocPesquisa = new VBox();
+        blocPesquisa.getChildren().addAll(label,pesquisar);
         
-        final VBox vbox = new VBox();
-        vbox.getChildren().addAll(label,pesquisar,table,adicionarPalleteSection);
-        root.setCenter(vbox);
+        TableView<ProdutoModel> table = createTableView();
+        final Label labelLista = new Label("ESTOQUE PRINCIPAL > LISTA DE PRODUTOS");
+        labelLista.setFont(new Font("Arial", 20));        
+        VBox blocoTabela = new VBox();
+        blocoTabela.getChildren().addAll(labelLista,table);
+        
+        
+        final Label labelEdicao = new Label("ESTOQUE PRINCIPAL > CADASTRO/EDIÇÃO DE PRODUTOS");
+        labelEdicao.setFont(new Font("Arial", 20));
+        VBox adicionarPalleteSection = createAdicionarProduto();
+        VBox blocoCadastro = new VBox();
+        blocoCadastro.getChildren().addAll(labelEdicao,adicionarPalleteSection);
+        
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER_LEFT);
+        
+        grid.add(blocPesquisa, 0, 1, 2, 1);
+        grid.add(blocoTabela, 0, 3, 2, 1);
+        grid.add(blocoCadastro, 0, 4, 2, 1);
+        
+        root.setCenter(grid);
 
 	}
 }
