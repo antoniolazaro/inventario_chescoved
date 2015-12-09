@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS  produto_mi(codigo int primary key, local_estoque varchar(250),nome varchar(250) not null, valor_custo decimal not null,valor_venda decimal not null,quantidade int default 0);
+CREATE TABLE IF NOT EXISTS  produto_mi(codigo int primary key, local_estoque varchar(250),nome varchar(250) not null, valor_custo decimal not null,valor_venda decimal,quantidade int default 0);
 ALTER TABLE produto ADD CONSTRAINT nome_produto_mi_unique UNIQUE(nome);
 
 CREATE TABLE IF NOT EXISTS  movimentacao_produto_mi(

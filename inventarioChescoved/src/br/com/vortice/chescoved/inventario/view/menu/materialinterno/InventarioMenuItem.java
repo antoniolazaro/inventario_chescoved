@@ -100,7 +100,6 @@ public class InventarioMenuItem {
             	
             	itemModificado.setQuantidadeDivergencia(itemModificado.getQuantidadeDivergencia());
             	itemModificado.setTotalCusto(itemModificado.getProduto().getValorCusto().multiply(new BigDecimal(itemModificado.getQuantidadeDivergencia())));
-            	itemModificado.setTotalVenda(itemModificado.getProduto().getValorVenda().multiply(new BigDecimal(itemModificado.getQuantidadeDivergencia())));
             	
             	tableViewProdutos.refresh();
             
@@ -132,22 +131,10 @@ public class InventarioMenuItem {
         totalCusto.setPrefWidth(200);
         totalCusto.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, BigDecimal>("totalCusto"));
         
-        TableColumn<InventarioProdutoModel, BigDecimal> valorVenda = new TableColumn<InventarioProdutoModel, BigDecimal>("Valor Venda");
-        valorVenda.setPrefWidth(200);
-        valorVenda.setCellValueFactory(new Callback<CellDataFeatures<InventarioProdutoModel, BigDecimal>, ObservableValue<BigDecimal>>() {
-            public ObservableValue<BigDecimal> call(CellDataFeatures<InventarioProdutoModel, BigDecimal> p) {
-                return new ReadOnlyObjectWrapper(p.getValue().getProduto().getValorVenda());
-            }
-         });
-
-        TableColumn<InventarioProdutoModel, BigDecimal> totalVenda = new TableColumn<InventarioProdutoModel, BigDecimal>("Total Venda");
-        totalVenda.setPrefWidth(200);
-        totalVenda.setCellValueFactory(new PropertyValueFactory<InventarioProdutoModel, BigDecimal>("totalVenda"));
-        
         conteudoTabela = FXCollections.observableArrayList(new ArrayList<InventarioProdutoModel>());
        
         table.setItems(conteudoTabela);
-        table.getColumns().addAll(codigoCol,nomeCol,codigoProdutoCol,quantidadeContada,quantidadeEstoque,quantidadeDivergencia,valorCusto,totalCusto,valorVenda,totalVenda);
+        table.getColumns().addAll(codigoCol,nomeCol,codigoProdutoCol,quantidadeContada,quantidadeEstoque,quantidadeDivergencia,valorCusto,totalCusto);
         
         
         return table;

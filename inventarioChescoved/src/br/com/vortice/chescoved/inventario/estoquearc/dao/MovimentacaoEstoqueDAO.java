@@ -50,7 +50,7 @@ public class MovimentacaoEstoqueDAO extends DAOAb {
       
         StringBuilder sql = new StringBuilder("SELECT mp.produto_codigo,mp.quantidade,produto.valor_custo,produto.nome,mp.nota_fiscal, ");
         sql.append(" mp.tipo_movimentacao_codigo,tipo_movimentacao.nome as nome_movimentacao,mp.data_movimentacao,mp.data_recebimento_produto ")
-        .append(" from movimentacao_produto_arc mp, produto,tipo_movimentacao ")
+        .append(" from movimentacao_produto_arc mp, produto_arc produto,tipo_movimentacao ")
         .append(" where mp.produto_codigo = produto.codigo ")
         .append(" and (mp.produto_codigo = ? or  ? is null) ")
         .append(" and mp.data_movimentacao >= ? and mp.data_movimentacao <= ? ")
