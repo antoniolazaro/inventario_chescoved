@@ -54,7 +54,7 @@ public class MovimentacaoEstoqueDAO extends DAOAb {
         .append(" and (mp.produto_codigo = ? or  ? is null) ")
         .append(" and mp.data_movimentacao >= ? and mp.data_movimentacao <= ? ")
         .append(" and mp.tipo_movimentacao_codigo = tipo_movimentacao.codigo ")
-        .append(" order by mp.produto_codigo,produto.valor_custo ");
+        .append(" order by mp.produto_codigo,mp.tipo_movimentacao_codigo,produto.valor_custo ");
         
         List<MovimentacaoEstoqueModel> lista = new ArrayList<MovimentacaoEstoqueModel>();
         try {

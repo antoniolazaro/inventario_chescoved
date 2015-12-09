@@ -1,7 +1,9 @@
 package br.com.vortice.chescoved.inventario.business;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import br.com.vortice.chescoved.inventario.dao.CurvaAbcDAO;
@@ -19,35 +21,12 @@ public class CurvaAbcBusiness{
 	public List<CurvaAbcModel> calcularCurvaABC(CurvaAbcModel curvaAbcFiltro) throws Exception{
 		List<CurvaAbcModel> listaCurvaAbc = curvaAbcDAO.selectMovimentacaoSaidaPorPeriodo(curvaAbcFiltro);
 		if(listaCurvaAbc.size() > 0){
-			BigDecimal valorTotalMovimentacoes = new BigDecimal(0);
-			for(CurvaAbcModel curvaAbc:listaCurvaAbc){
-				valorTotalMovimentacoes.add(curvaAbc.getValorTotal());
-			}
-			
-			List<CurvaAbcModel> listaProdutosAgrupadosPorMovimentacaoSaida = new ArrayList<CurvaAbcModel>();
-			ProdutoModel produto = listaCurvaAbc.get(0).getProduto();
-			listaProdutosAgrupadosPorMovimentacaoSaida.add(listaCurvaAbc.get(0));
-			Long codigoProdutoAtual = produto.getCodigo();
-			Integer quantidadeTotal = 0;
-			BigDecimal valorTotal = new BigDecimal(0);
-			for(CurvaAbcModel curvaAbc:listaCurvaAbc){
-				if(!codigoProdutoAtual.equals(produto.getCodigo())){
-					CurvaAbcModel curvaAbcAgrupado = new CurvaAbcModel();
-					curvaAbcAgrupado.setProduto(curvaAbc.getProduto());
-					curvaAbcAgrupado.setQuantidade(quantidadeTotal);
-					curvaAbcAgrupado.setValorUnitario(valorTotal);
-					listaProdutosAgrupadosPorMovimentacaoSaida.add(curvaAbc);
-					quantidadeTotal = 0;
-					valorTotal = new BigDecimal(0);
-				}
-				quantidadeTotal+=curvaAbc.getQuantidade();
-				valorTotal.add(curvaAbc.getValorUnitario());
-			}
-			
+			BigDecimal valorTotalMovimentacoes = calcularValorTotal(listaCurvaAbc);
+			List<CurvaAbcModel> listaProdutosAgrupadosPorMovimentacaoSaida = calcularValorAgrupados(listaCurvaAbc);
 			List<CurvaAbcModel> listaProdutosFinais = new ArrayList<CurvaAbcModel>();
-			for(CurvaAbcModel curvaAbc:listaCurvaAbc){
-				curvaAbc.setPercentualSaida(calcularValorPercentual(curvaAbc,valorTotalMovimentacoes)+"%");
-				listaProdutosFinais.add(curvaAbc);
+			for(CurvaAbcModel curvaAbcCalculoPercentual:listaProdutosAgrupadosPorMovimentacaoSaida){
+				curvaAbcCalculoPercentual.setPercentualSaida(calcularValorPercentual(curvaAbcCalculoPercentual,valorTotalMovimentacoes)+" %");
+				listaProdutosFinais.add(curvaAbcCalculoPercentual);
 			}
 			
 			return listaProdutosFinais;		
@@ -55,9 +34,67 @@ public class CurvaAbcBusiness{
 			throw new Exception("Não há movimentação para esse período.");
 		}
 	}
+
+	protected List<CurvaAbcModel> calcularValorAgrupados(List<CurvaAbcModel> listaCurvaAbc) {
+		List<CurvaAbcModel> listaProdutosAgrupadosPorMovimentacaoSaida = new ArrayList<CurvaAbcModel>();
+		if(listaCurvaAbc.size() > 0){
+			ProdutoModel produto = null;
+			Integer quantidadeTotal = 0;
+			BigDecimal valorTotal = new BigDecimal(0);
+			
+			Iterator<CurvaAbcModel> it = listaCurvaAbc.iterator();
+			do{
+				CurvaAbcModel curvaAbcAgrupado = new CurvaAbcModel();
+				CurvaAbcModel curvaAbc = it.next();
+				if(produto == null){
+					produto = curvaAbc.getProduto();
+					quantidadeTotal = 0;
+					valorTotal = new BigDecimal(0);
+				}
+				if(curvaAbc.getProduto().equals(produto)){
+					quantidadeTotal+=curvaAbc.getQuantidade();
+					valorTotal = valorTotal.add(curvaAbc.getValorUnitario());	
+				}else{
+					curvaAbcAgrupado.setProduto(produto);
+					curvaAbcAgrupado.setQuantidade(quantidadeTotal);
+					curvaAbcAgrupado.setValorUnitario(produto.getValorCusto());
+					curvaAbcAgrupado.setValorTotal(produto.getValorCusto().multiply(new BigDecimal(quantidadeTotal)));
+					listaProdutosAgrupadosPorMovimentacaoSaida.add(curvaAbcAgrupado);
+					quantidadeTotal = 0;
+					valorTotal = new BigDecimal(0);
+					produto = curvaAbc.getProduto();
+					quantidadeTotal+=curvaAbc.getQuantidade();
+					valorTotal = valorTotal.add(curvaAbc.getValorUnitario());
+				}
+				if(!it.hasNext()){
+					curvaAbcAgrupado.setProduto(produto);
+					curvaAbcAgrupado.setQuantidade(quantidadeTotal);
+					curvaAbcAgrupado.setValorUnitario(produto.getValorCusto());
+					curvaAbcAgrupado.setValorTotal(produto.getValorCusto().multiply(new BigDecimal(quantidadeTotal)));
+					listaProdutosAgrupadosPorMovimentacaoSaida.add(curvaAbcAgrupado);
+					produto = curvaAbc.getProduto();
+					quantidadeTotal+=curvaAbc.getQuantidade();
+					valorTotal = valorTotal.add(curvaAbc.getValorUnitario());
+				}
+			}while(it.hasNext());	
+			
+		}
+		return listaProdutosAgrupadosPorMovimentacaoSaida;
+	}
+
+	protected BigDecimal calcularValorTotal(List<CurvaAbcModel> listaCurvaAbc) {
+		BigDecimal valorTotalMovimentacoes = new BigDecimal(0);
+		for(CurvaAbcModel curvaAbc:listaCurvaAbc){
+			valorTotalMovimentacoes = valorTotalMovimentacoes.add(curvaAbc.getValorUnitario().multiply(new BigDecimal(curvaAbc.getQuantidade())));
+		}
+		return valorTotalMovimentacoes;
+	}
 	
 	private String calcularValorPercentual(CurvaAbcModel curvaAbc,BigDecimal valorTotalMovimentacoes){
-		return (curvaAbc.getValorTotal().divide(valorTotalMovimentacoes).multiply(new BigDecimal(100))).setScale(2).toString();
+		BigDecimal valorTotal = curvaAbc.getValorTotal();
+		BigDecimal valorBruto = valorTotal.divide(valorTotalMovimentacoes,5, RoundingMode.CEILING);
+		BigDecimal valorFinal = valorBruto.multiply(new BigDecimal(100));
+		return valorFinal.toString();
 	}
 
 	

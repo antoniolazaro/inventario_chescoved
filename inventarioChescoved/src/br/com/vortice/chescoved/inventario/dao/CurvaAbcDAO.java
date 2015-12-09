@@ -1,5 +1,6 @@
 package br.com.vortice.chescoved.inventario.dao;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,6 @@ public class CurvaAbcDAO extends DAOAb {
         ResultSet rs = null;
       
         StringBuilder sql = new StringBuilder("SELECT mp.produto_codigo,mp.quantidade,produto.valor_custo,produto.nome  ");
-        
         sql.append(" from movimentacao_produto mp, produto ")
         .append(" where mp.produto_codigo = produto.codigo ")
         .append(" and mp.data_movimentacao >= ? and mp.data_movimentacao <= ? ")
@@ -39,7 +39,9 @@ public class CurvaAbcDAO extends DAOAb {
             	CurvaAbcModel curvaAbc = new CurvaAbcModel();
             	curvaAbc.setProduto(new ProdutoModel(rs.getLong("produto_codigo")));
             	curvaAbc.setQuantidade(rs.getInt("quantidade"));
-            	curvaAbc.setValorUnitario(rs.getBigDecimal("valor_custo"));
+            	BigDecimal valorCusto = rs.getBigDecimal("valor_custo");
+            	curvaAbc.getProduto().setValorCusto(valorCusto);
+            	curvaAbc.setValorUnitario(valorCusto);
             	curvaAbc.getProduto().setNome(rs.getString("nome"));
             	lista.add(curvaAbc);
             }

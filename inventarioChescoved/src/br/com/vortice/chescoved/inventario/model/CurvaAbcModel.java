@@ -12,6 +12,7 @@ public class CurvaAbcModel {
 	private ProdutoModel produto;
 	private Integer quantidade;
 	private BigDecimal valorUnitario;
+	private BigDecimal valorTotal;
 	
 	public Date getDataInicio() {
 		return dataInicio;
@@ -44,11 +45,10 @@ public class CurvaAbcModel {
 		this.valorUnitario = valorUnitario;
 	}
 	public BigDecimal getValorTotal() {
-		if(valorUnitario != null && quantidade != null){
-			return valorUnitario.multiply(new BigDecimal(quantidade));
-		}else{
-			return new BigDecimal(0);
-		}
+		return valorTotal;
+	}
+	public void setValorTotal(BigDecimal valorTotal) {
+		this.valorTotal = valorTotal;
 	}
 	public String getClassificacaoCurvaABC() {
 		return classificacaoCurvaABC;
