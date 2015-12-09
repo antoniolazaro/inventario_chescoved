@@ -18,7 +18,7 @@ public class PepsDAO extends DAOAb {
         ResultSet rs = null;
         
         StringBuilder sql = new StringBuilder("SELECT mp.data_movimentacao,mp.produto_codigo,mp.quantidade,mp.nota_fiscal,produto.nome,mp.data_recebimento_produto  ");
-        sql.append(" from movimentacao_produto_arc mp, produto_arc ")
+        sql.append(" from movimentacao_produto_arc mp, produto_arc produto ")
         .append(" where mp.produto_codigo = produto.codigo ")
         .append(" and mp.tipo_movimentacao_codigo = 1 ")
         .append(" and mp.produto_codigo = ? ")
@@ -59,7 +59,7 @@ public class PepsDAO extends DAOAb {
         ResultSet rs = null;
         
         StringBuilder sql = new StringBuilder("SELECT sum(mp.quantidade) as total  ");
-        sql.append(" from movimentacao_produto_arc mp, produto_arc ")
+        sql.append(" from movimentacao_produto_arc mp, produto_arc produto ")
         .append(" where mp.produto_codigo = produto.codigo ")
         .append(" and mp.tipo_movimentacao_codigo = 2 ")
         .append(" and mp.produto_codigo = ? ")

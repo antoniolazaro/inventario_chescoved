@@ -20,7 +20,7 @@ public class CurvaAbcDAO extends DAOAb {
         ResultSet rs = null;
       
         StringBuilder sql = new StringBuilder("SELECT mp.produto_codigo,mp.quantidade,produto.valor_custo,produto.nome  ");
-        sql.append(" from movimentacao_produto_arc mp, produto_arc ")
+        sql.append(" from movimentacao_produto_arc mp, produto_arc produto ")
         .append(" where mp.produto_codigo = produto.codigo ")
         .append(" and mp.data_movimentacao >= ? and mp.data_movimentacao <= ? ")
         .append(" and mp.tipo_movimentacao_codigo = 2 ")
